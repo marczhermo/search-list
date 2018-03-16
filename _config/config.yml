@@ -1,3 +1,12 @@
 ---
 Name: searchlist
 ---
+Marcz\Search\Config:
+  page_length: 100
+  indices:
+    - name: 'Pages'
+      class: 'Page'
+  clients:
+    - name: 'MySQL'
+      write: false
+      class: 'Marcz\Search\Client\MySQL'
