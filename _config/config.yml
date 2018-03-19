@@ -1,11 +1,17 @@
 ---
 Name: searchlist
 ---
+SilverStripe\CMS\Model\SiteTree:
+  extensions:
+    - Marcz\Search\Extenstions\SearchListSiteTree
 Marcz\Search\Config:
   page_length: 100
   indices:
     - name: 'Pages'
       class: 'Page'
+      has_one: true
+      has_many: true
+      many_many: true
   clients:
     - name: 'MySQL'
       write: false

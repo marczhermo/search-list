@@ -2,8 +2,18 @@
 
 namespace Marcz\Search;
 
-use SilverStripe\ORM\DataList;
+use SilverStripe\View\ViewableData;
 
-class SearchList extends DataList
+// use SilverStripe\ORM\SS_List;
+// use SilverStripe\ORM\Filterable;
+// use Marcz\Search\Traits\Listable;
+// use Marcz\Search\Traits\Filterables;
+
+// class SearchList extends ViewableData implements SS_List, Filterable
+class SearchList extends ViewableData
 {
+    // use Listable;
+    // use Filterables;
+
+    protected $query;
 }

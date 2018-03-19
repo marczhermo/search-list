@@ -1,15 +1,18 @@
 <?php
 
-namespace Marcz\Search;
+namespace Marcz\Search\Processor;
 
 use SilverStripe\Core\Injector\Injectable;
+use SilverStripe\Core\Extensible;
 use SilverStripe\ORM\DataObject;
 use SilverStripe\Core\Injector\Injector;
 use SilverStripe\ORM\DataList;
+use Marcz\Search\Config;
 
 class Exporter
 {
     use Injectable;
+    use Extensible;
 
     protected $className;
 
@@ -27,7 +30,6 @@ class Exporter
         $fields   = DataObject::getSchema()
             ->databaseFields(get_class($dataObject), $aggregate = false);
 
-        $map['objectID'] = (int) $dataObject->ID;
         foreach ($fields as $column => $fieldType) {
             if (in_array($fieldType, ['PrimaryKey'])
                 || !isset($map[$column])
@@ -65,9 +67,9 @@ class Exporter
             $contents = [];
             foreach ($dataObject->{$column}() as $item) {
                 $items[] = $item->getTitle();
-                if ($item->Content) {
+                if (!empty($item->Content)) {
                     $contents[] = $item->Content;
-                } elseif ($item->HTML) {
+                } elseif (!empty($item->HTML)) {
                     $contents[] = $item->HTML;
                 }
             }
@@ -79,6 +81,7 @@ class Exporter
             }
         }
 
+        $this->extend('updateExport', $map);
         $dataObject->destroy();
 
         return $map;

@@ -4,7 +4,7 @@ namespace Marcz\Search\Tasks;
 
 use SilverStripe\Dev\BuildTask;
 use Marcz\Search\Config;
-use Marcz\Search\Exporter;
+use Marcz\Search\Processor\Exporter;
 use SilverStripe\Assets\File;
 use SilverStripe\ORM\FieldType\DBDatetime;
 use SilverStripe\Core\Config\Config as FileConfig;
@@ -18,7 +18,7 @@ class JsonExporter extends BuildTask
     public function run($request)
     {
         $indices = Config::config()->get('indices');
-        $length = Config::config()->get('page_length');
+        $length  = Config::config()->get('page_length');
 
         FileConfig::modify()->set(File::class, 'allowed_extensions', ['json']);
 
