@@ -4,6 +4,9 @@ Name: searchlist
 SilverStripe\CMS\Model\SiteTree:
   extensions:
     - Marcz\Search\Extenstions\SearchListSiteTree
+Marcz\Search\Processor\Exporter:
+  extensions:
+    - Marcz\Search\Extensions\SafeguardMember
 Marcz\Search\Config:
   page_length: 100
   indices:
