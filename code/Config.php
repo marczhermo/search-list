@@ -11,23 +11,23 @@ class Config
 
     public function details()
     {
-        $details = [];
-        foreach (self::config()->get('indices') as $index) {
-            $config = [
-                'clients'    => [],
-                'indexName'  => $index['name'],
-                'dataObject' => $index['class'],
-            ];
+        // $details = [];
+        // foreach (self::config()->get('indices') as $index) {
+        //     $config = [
+        //         'clients'    => [],
+        //         'indexName'  => $index['name'],
+        //         'dataObject' => $index['class'],
+        //     ];
 
-            foreach (self::config()->get('clients') as $client) {
-                $config['clients'][] = $client;
-            }
+        //     foreach (self::config()->get('clients') as $client) {
+        //         $config['clients'][] = $client;
+        //     }
 
-            $details[] = $config;
-        }
+        //     $details[] = $config;
+        // }
 
         return [
-            'configs'     => $details,
+            // 'configs'     => $details,
             'indices'     => self::config()->get('indices'),
             'clients'     => self::config()->get('clients'),
             'page_length' => self::config()->get('page_length'),

@@ -87,16 +87,17 @@ class Exporter
         return $map;
     }
 
-    public function bulkExport($className, $startAt = 0, $max = null)
+    public function bulkExport($className, $startAt = 0)
     {
         $list   = new DataList($className);
         $total  = $list->count();
-        $length = Config::config()->get('page_length');
+        $length = 20;
+        $max    = Config::config()->get('page_length');
+        $bulk   = [];
+        $start  = $startAt;
+        $pages  = $list->limit("$start,$length");
+        $count  = 0;
 
-        $bulk  = [];
-        $start = $startAt;
-        $pages = $list->limit("$start,$length");
-        $count = 0;
         while ($pages) {
             foreach ($pages as $page) {
                 if (!$page) {
@@ -108,6 +109,7 @@ class Exporter
                 unset($page);
                 $count++;
             }
+
             if ($pages->count() > ($length - 1)) {
                 $start += $length;
                 $pages = $list->limit("$start,$length");
