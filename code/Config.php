@@ -28,9 +28,9 @@ class Config
 
         return [
             // 'configs'     => $details,
-            'indices'     => self::config()->get('indices'),
-            'clients'     => self::config()->get('clients'),
-            'page_length' => self::config()->get('page_length'),
+            'indices'      => self::config()->get('indices'),
+            'clients'      => self::config()->get('clients'),
+            'batch_length' => self::config()->get('batch_length'),
         ];
     }
 }

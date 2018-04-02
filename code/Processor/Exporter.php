@@ -87,12 +87,12 @@ class Exporter
         return $map;
     }
 
-    public function bulkExport($className, $startAt = 0)
+    public function bulkExport($className, $startAt = 0, $max = 0)
     {
         $list   = new DataList($className);
         $total  = $list->count();
         $length = 20;
-        $max    = Config::config()->get('page_length');
+        $max    = $max ?: Config::config()->get('batch_length');
         $bulk   = [];
         $start  = $startAt;
         $pages  = $list->limit("$start,$length");

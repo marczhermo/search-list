@@ -7,13 +7,13 @@ use Marcz\Search\Config;
 use SilverStripe\ORM\ArrayList;
 use SilverStripe\Core\Injector\Injector;
 
-class DataExporter extends BuildTask
+class Configure extends BuildTask
 {
-    private static $segment = 'SearchList_DataExporter';
+    private static $segment = 'SearchList_Configure';
 
-    protected $title = 'SearchList: Exports DataObjects into Json or XML documents';
+    protected $title = 'SearchList: Configure DataObjects to Indices';
 
-    protected $description = 'Creates a batch of queue jobs for sending bulk records to client API.';
+    protected $description = 'Creates and initialise indices using the client API.';
 
     public function run($request)
     {
@@ -21,12 +21,11 @@ class DataExporter extends BuildTask
         $clients = ArrayList::create(Config::config()->get('clients'))
                     ->filter([
                         'write'  => true,
-                        'export' => ['json', 'xml'],
                     ]);
 
         if (!$clients->exists()) {
             $noClient = <<<NOCLIENT
-Error: No clients with 'write' and 'export' configurations. See example below:
+Error: No clients with 'write' configurations. See example below:
 <pre>
 Marcz\Search\Config:
     clients:
@@ -41,11 +40,11 @@ NOCLIENT;
 
         $message = '';
         foreach ($indices as $index) {
-            $message .= sprintf('<p>Creating export job for class "%s"</p>', $index['class']);
+            $message .= sprintf('<p>Creating index, "%s" for class "%s"</p>', $index['name'], $index['class']);
             foreach ($clients as $client) {
                 $className = $client->getField('class');
                 $clientObj = Injector::inst()->create($className);
-                $clientObj->createBulkExportJob($index['name'], $index['class']);
+                $clientObj->createIndex($index['name']);
                 $message .= sprintf('<p>Using client "%s"</p>', $className);
             }
         }

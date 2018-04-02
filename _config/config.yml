@@ -8,7 +8,7 @@ Marcz\Search\Processor\Exporter:
   extensions:
     - Marcz\Search\Extensions\SafeguardMember
 Marcz\Search\Config:
-  page_length: 100
+  batch_length: 100
   indices:
     - name: 'Pages'
       class: 'Page'
