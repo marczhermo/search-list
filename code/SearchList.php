@@ -3,6 +3,11 @@
 namespace Marcz\Search;
 
 use SilverStripe\View\ViewableData;
+use SilverStripe\Core\Injector\Injector;
+use SilverStripe\ORM\ArrayList;
+use Marcz\Search\Config as SearchConfig;
+use SilverStripe\Control\HTTPRequest;
+use Exception;
 
 // use SilverStripe\ORM\SS_List;
 // use SilverStripe\ORM\Filterable;
@@ -15,5 +20,15 @@ class SearchList extends ViewableData
     // use Listable;
     // use Filterables;
 
+    protected $term;
+    protected $index;
+    protected $client;
     protected $query;
+
+    public function __construct($term = '', $index = null, $client = null)
+    {
+        $this->term = $term;
+        $this->index = SearchConfig::resolveIndex($index);
+        $this->client = SearchConfig::resolveClient($client);
+    }
 }
