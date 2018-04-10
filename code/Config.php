@@ -23,44 +23,53 @@ class Config
         ];
     }
 
-    public static function resolveIndex($index = null)
+    public static function resolveIndex($indexName = null)
     {
         $indices = ArrayList::create(self::config()->get('indices'));
-        $currentIndex = $indices->filter(['name' => $index])->first();
+        $index = $indices->filter(['name' => $indexName])->first();
 
-        return $currentIndex ? $currentIndex['name'] : $indices->first()['name'];
+        return $index ? $index['name'] : $indices->first()['name'];
     }
 
-    public static function resolveClient($client)
+    public static function resolveClient($clientName)
     {
         $request = Injector::inst()->get(HTTPRequest::class);
         $session = $request->getSession();
-        $rememberedClient = $session->get(self::config()->get('session_key'));
         $clients = ArrayList::create(self::config()->get('clients'));
-        $requestedClient = $clients->filter(['name' => $client])->first();
+        $rememberedClient = $session->get(self::config()->get('session_key'));
 
-        if (!$requestedClient) {
-            $noClient = <<<NOCLIENT
+        if ($clientName) {
+            $client = $clients->filter(['name' => $clientName])->first();
+            if (!$client) {
+                $noClient = <<<NOCLIENT
 Error: No clients configurations. See example below:
 <pre>
 Marcz\Search\Config:
-    clients:
+  clients:
     - name: 'Algolia'
-        write: true
-        export: 'json'
-        class: 'Marcz\Algolia\AlgoliaClient'
+      write: true
+      delete: true
+      export: 'json'
+      class: 'Marcz\Algolia\AlgoliaClient'
 </pre>
 NOCLIENT;
-            throw new Exception($noClient);
+                throw new Exception($noClient);
+            }
+
+            $requestedClient = $client['name'];
+            $session->set(self::config()->get('session_key'), $requestedClient);
+        } else {
+            $requestedClient = $rememberedClient;
         }
 
-        if ($rememberedClient === $requestedClient['name']) {
-            return $rememberedClient;
+        if ($requestedClient) {
+            return $requestedClient;
         }
 
-        $session->set(self::config()->get('session_key'), $requestedClient['name']);
+        $requestedClient = $clients->first()['name'];
+        $session->set(self::config()->get('session_key'), $requestedClient);
 
-        return $requestedClient['name'];
+        return $requestedClient;
     }
 
     public static function getCurrentClient()

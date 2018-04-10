@@ -25,10 +25,10 @@ class SearchList extends ViewableData
     protected $client;
     protected $query;
 
-    public function __construct($term = '', $index = null, $client = null)
+    public function __construct($term = '', $indexName = null, $clientName = null)
     {
         $this->term = $term;
-        $this->index = SearchConfig::resolveIndex($index);
-        $this->client = SearchConfig::resolveClient($client);
+        $this->index = SearchConfig::resolveIndex($indexName);
+        $this->client = SearchConfig::resolveClient($clientName);
     }
 }

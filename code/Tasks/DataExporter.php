@@ -29,11 +29,12 @@ class DataExporter extends BuildTask
 Error: No clients with 'write' and 'export' configurations. See example below:
 <pre>
 Marcz\Search\Config:
-    clients:
+  clients:
     - name: 'Algolia'
-        write: true
-        export: 'json'
-        class: 'Marcz\Algolia\AlgoliaClient'
+      write: true
+      delete: true
+      export: 'json'
+      class: 'Marcz\Algolia\AlgoliaClient'
 </pre>
 NOCLIENT;
             die($noClient);

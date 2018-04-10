@@ -28,11 +28,12 @@ class Configure extends BuildTask
 Error: No clients with 'write' configurations. See example below:
 <pre>
 Marcz\Search\Config:
-    clients:
+  clients:
     - name: 'Algolia'
-        write: true
-        export: 'json'
-        class: 'Marcz\Algolia\AlgoliaClient'
+      write: true
+      delete: true
+      export: 'json'
+      class: 'Marcz\Algolia\AlgoliaClient'
 </pre>
 NOCLIENT;
             die($noClient);
