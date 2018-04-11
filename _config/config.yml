@@ -18,5 +18,6 @@ Marcz\Search\Config:
   clients:
     - name: 'MySQL'
       write: false
+      delete: false
       export: false
       class: 'Marcz\Search\Client\MySQL'

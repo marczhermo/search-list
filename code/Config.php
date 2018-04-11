@@ -26,17 +26,18 @@ class Config
     public static function resolveIndex($indexName = null)
     {
         $indices = ArrayList::create(self::config()->get('indices'));
-        $index = $indices->filter(['name' => $indexName])->first();
+        $index   = $indices->filter(['name' => $indexName])->first();
 
         return $index ? $index['name'] : $indices->first()['name'];
     }
 
     public static function resolveClient($clientName)
     {
-        $request = Injector::inst()->get(HTTPRequest::class);
-        $session = $request->getSession();
-        $clients = ArrayList::create(self::config()->get('clients'));
+        $request          = Injector::inst()->get(HTTPRequest::class);
+        $session          = $request->getSession();
+        $clients          = ArrayList::create(self::config()->get('clients'));
         $rememberedClient = $session->get(self::config()->get('session_key'));
+        var_dump('rememberedClient', $rememberedClient);
 
         if ($clientName) {
             $client = $clients->filter(['name' => $clientName])->first();
@@ -74,8 +75,8 @@ NOCLIENT;
 
     public static function getCurrentClient()
     {
-        $request = Injector::inst()->get(HTTPRequest::class);
-        $session = $request->getSession();
+        $request          = Injector::inst()->get(HTTPRequest::class);
+        $session          = $request->getSession();
         $rememberedClient = $session->get(self::config()->get('session_key'));
 
         return ArrayList::create(self::config()->get('clients'))

@@ -70,4 +70,6 @@ interface SearchClientAdaptor
      * @param int    $recordId Record ID
      */
     public function createDeleteJob($indexName, $className, $recordId);
+
+    public function search();
 }
