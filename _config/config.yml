@@ -15,6 +15,13 @@ Marcz\Search\Config:
       has_one: true
       has_many: true
       many_many: true
+      searchableAttributes:
+        - 'Title'
+        - 'Content'
+        - 'MetaDescription'
+      attributesForFaceting:
+        - 'Title'
+        - 'ShowInSearch'
   clients:
     - name: 'MySQL'
       write: false
