@@ -22,13 +22,25 @@ class SearchList extends ViewableData
     protected $index;
     protected $client;
     protected $query;
-    protected $filters = [];
+    protected $filters    = [];
+    protected $pageNumber = 0;
+    protected $pageLength = 20;
 
     public function __construct($term = '', $indexName = null, $clientName = null)
     {
         $this->term   = $term;
         $this->index  = SearchConfig::resolveIndex($indexName);
         $this->client = SearchConfig::resolveClient($clientName);
+    }
+
+    public function setPageNumber($pageNumber)
+    {
+        $this->pageNumber = (int) $pageNumber;
+    }
+
+    public function setPageLength($pageLength)
+    {
+        $this->pageLength = (int) $pageLength;
     }
 
     public function fetch()
@@ -38,7 +50,12 @@ class SearchList extends ViewableData
 
         $clientObj->initIndex($this->index);
 
-        return $clientObj->search($this->term);
+        return $clientObj->search(
+            $this->term,
+            $this->filters,
+            $this->pageNumber,
+            $this->pageLength
+        );
     }
 
     public function filter()

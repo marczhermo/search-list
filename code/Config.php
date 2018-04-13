@@ -37,7 +37,6 @@ class Config
         $session          = $request->getSession();
         $clients          = ArrayList::create(self::config()->get('clients'));
         $rememberedClient = $session->get(self::config()->get('session_key'));
-        var_dump('rememberedClient', $rememberedClient);
 
         if ($clientName) {
             $client = $clients->filter(['name' => $clientName])->first();
