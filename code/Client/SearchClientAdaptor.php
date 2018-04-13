@@ -72,4 +72,6 @@ interface SearchClientAdaptor
     public function createDeleteJob($indexName, $className, $recordId);
 
     public function search($term, $filters, $pageNumber, $pageLength);
+
+    public function callIndexMethod($methodName, $parameters);
 }
