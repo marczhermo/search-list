@@ -87,7 +87,7 @@ class SearchList extends ViewableData
     public function addFilter($filterArray)
     {
         foreach ($filterArray as $expression => $value) {
-            $this->filters[$expression] = $value;
+            $this->filters[][$expression] = $value;
         }
 
         return $this;
