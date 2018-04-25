@@ -8,20 +8,12 @@ use SilverStripe\Core\Injector\Injector;
 use InvalidArgumentException;
 use Exception;
 
-// use SilverStripe\ORM\SS_List;
-// use SilverStripe\ORM\Filterable;
-// use Marcz\Search\Traits\Listable;
-// use Marcz\Search\Traits\Filterables;
-
-// class SearchList extends ViewableData implements SS_List, Filterable
 class SearchList extends ViewableData
 {
-    // use Listable;
-    // use Filterables;
-
     protected $term;
     protected $index;
     protected $client;
+    protected $clientAPI;
     protected $query;
     protected $filters    = [];
     protected $pageNumber = 0;
@@ -49,10 +41,10 @@ class SearchList extends ViewableData
         $clientConfig = SearchConfig::getCurrentClient();
 
         try {
-            $clientObj = Injector::inst()->create($clientConfig['class']);
-            $clientObj->initIndex($this->index);
+            $this->clientAPI = Injector::inst()->create($clientConfig['class']);
+            $this->clientAPI->initIndex($this->index);
 
-            $response = $clientObj->search(
+            $response = $this->clientAPI->search(
                 $this->term,
                 $this->filters,
                 $this->pageNumber,
@@ -63,6 +55,16 @@ class SearchList extends ViewableData
         }
 
         return $response;
+    }
+
+    /**
+     * Undocumented function
+     *
+     * @return void
+     */
+    public function getResponse()
+    {
+        return $this->clientAPI->getResponse();
     }
 
     public function filter()

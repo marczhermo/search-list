@@ -40,4 +40,11 @@ interface SearchClientAdaptor
      * @return mixed
      */
     public function callClientMethod($methodName, $parameters);
+
+    /**
+     * Returns the actual response from the Client API
+     *
+     * @return mixed
+     */
+    public function getResponse();
 }
