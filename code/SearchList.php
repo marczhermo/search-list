@@ -6,6 +6,7 @@ use SilverStripe\View\ViewableData;
 use Marcz\Search\Config as SearchConfig;
 use SilverStripe\Core\Injector\Injector;
 use InvalidArgumentException;
+use Exception;
 
 // use SilverStripe\ORM\SS_List;
 // use SilverStripe\ORM\Filterable;
@@ -46,16 +47,22 @@ class SearchList extends ViewableData
     public function fetch()
     {
         $clientConfig = SearchConfig::getCurrentClient();
-        $clientObj    = Injector::inst()->create($clientConfig['class']);
 
-        $clientObj->initIndex($this->index);
+        try {
+            $clientObj = Injector::inst()->create($clientConfig['class']);
+            $clientObj->initIndex($this->index);
 
-        return $clientObj->search(
-            $this->term,
-            $this->filters,
-            $this->pageNumber,
-            $this->pageLength
-        );
+            $response = $clientObj->search(
+                $this->term,
+                $this->filters,
+                $this->pageNumber,
+                $this->pageLength
+            );
+        } catch (Exception $e) {
+            return $e->getMessage();
+        }
+
+        return $response;
     }
 
     public function filter()

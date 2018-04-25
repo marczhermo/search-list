@@ -7,7 +7,7 @@ use Marcz\Search\SearchList;
 
 class SearchContentExtension extends Extension
 {
-    public function createSearch($term, $index = null, $client = null)
+    public function createSearch($term= '', $index = null, $client = null)
     {
         return SearchList::create($term, $index, $client);
     }
