@@ -27,4 +27,4 @@ Marcz\Search\Config:
       write: false
       delete: false
       export: false
-      class: 'Marcz\Search\Client\MySQL'
+      class: 'Marcz\Search\Client\MySQLClient'

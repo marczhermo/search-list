@@ -1,10 +1,170 @@
 <?php
 
-use Marcz\Search\Client\DataSearcher;
+namespace Marcz\Search\Client;
 
-class MySQLClient implements DataSearcher
+use SilverStripe\ORM\DataList;
+use SilverStripe\ORM\ArrayList;
+use SilverStripe\ORM\DataObject;
+use Marcz\Search\Config;
+use SilverStripe\Core\Injector\Injector;
+
+class MySQLClient implements SearchClientAdaptor, DataSearcher
 {
+    protected $indexName;
+    protected $indexConfig;
+    protected $clientAPI;
+    protected $response;
+
+    /**
+     * Instantiates the Client Library API
+     */
+    public function createClient()
+    {
+        $indexConfig = ArrayList::create(Config::config()->get('indices'))
+            ->filter(['name' => $this->indexName])->first();
+
+        $this->clientAPI   = new DataList($indexConfig['class']);
+        $this->indexConfig = $indexConfig;
+
+        return $this->clientAPI;
+    }
+
+    /**
+     * Initialise the Index after creating a client instance
+     *
+     * @param string $indexName
+     */
+    public function initIndex($indexName)
+    {
+        $this->indexName = $indexName;
+
+        return $this->createClient();
+    }
+
+    /**
+     * Creates the Index when not found.
+     * Note: Some clients automatically creates the index for you when importing documents.
+     *
+     * @param string $indexName
+     */
+    public function createIndex($indexName)
+    {
+        return $this->initIndex($indexname);
+    }
+
+    /**
+     * Some clients have documents run through index object
+     *
+     * @param string $methodName
+     * @param array $parameters
+     * @return mixed
+     */
+    public function callIndexMethod($methodName, $parameters)
+    {
+        return $this->callClientMethod($methodName, $parameters);
+    }
+
+    /**
+     * Some clients have documents run through client object
+     *
+     * @param string $methodName
+     * @param array $parameters
+     * @return mixed
+     */
+    public function callClientMethod($methodName, $parameters = [])
+    {
+        return call_user_func_array([$this->clientAPI, $methodName], $parameters);
+    }
+
+    /**
+     * Returns the actual response from the Client API
+     *
+     * @return mixed
+     */
+    public function getResponse()
+    {
+        return $this->response;
+    }
+
     public function search($term, $filters, $pageNumber, $pageLength)
     {
+        $attribs  = $this->indexConfig['searchableAttributes'];
+        $schema   = DataObject::getSchema();
+        $fields   = $schema->databaseFields($this->indexConfig['class']);
+        $object   = Injector::inst()->create($this->indexConfig['class']);
+        $hasOne   = $object->config()->get('has_one');
+        $hasMany  = $object->config()->get('has_many');
+        $manyMany = $object->config()->get('many_many');
+
+        $foreign    = array_merge($hasOne, $hasMany, $manyMany);
+        $orFilters  = $this->createInitialPartialMatch($term);
+        $andFilters = [];
+
+        $fieldSpecs  = $schema->fieldSpecs($this->indexConfig['class']);
+        $columns     = array_flip($attribs);
+        $foreignKeys = array_intersect_key($foreign, $columns);
+
+        foreach ($foreignKeys as $columnName => $dataClass) {
+            $filterName  = 'PartialMatch';
+            $filterValue = $term;
+            $titleOrName = '';
+
+            if ($schema->fieldSpec($dataClass, 'Title')) {
+                $titleOrName = 'Title';
+            }
+
+            if ($schema->fieldSpec($dataClass, 'Name')) {
+                $titleOrName = 'Name';
+            }
+
+            if (!$titleOrName) {
+                continue;
+            }
+
+            foreach ($filters as $filter) {
+                $columnFilters  = explode(':', key($filter));
+                $filterKey      = array_shift($columnFilters);
+                if ($columnName === $filterKey) {
+                    $filterName  = implode(':', $columnFilters);
+                    $filterValue = current($filter);
+                    break;
+                }
+            }
+
+            if ($filterName === 'PartialMatch') {
+                $orFilters[$columnName . '.' . $titleOrName . ':' . $filterName] = $filterValue;
+            } else {
+                $andFilters[$columnName . '.' . $titleOrName . ':' . $filterName] = $filterValue;
+            }
+        }
+
+        if ($orFilters) {
+            $this->clientAPI = $this->clientAPI->filterAny($orFilters);
+        }
+
+        if ($andFilters) {
+            $this->clientAPI = $this->clientAPI->filter($andFilters);
+        }
+
+        $this->response = $this->clientAPI->toNestedArray();
+
+        return new ArrayList($this->response);
+    }
+
+    public function createInitialPartialMatch($term)
+    {
+        $attribs = $this->indexConfig['searchableAttributes'];
+        $columns = array_flip($attribs);
+        $schema  = DataObject::getSchema();
+        $fields  = $schema->databaseFields($this->indexConfig['class']);
+
+        return array_reduce(
+            array_keys(array_intersect_key($fields, $columns)),
+            function ($carry, $column) use ($term) {
+                $carry[$column . ':PartialMatch'] = $term;
+                return $carry;
+            },
+            []
+        );
     }
 }
