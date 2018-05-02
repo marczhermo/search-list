@@ -13,7 +13,7 @@ class MySQLClient implements SearchClientAdaptor, DataSearcher
     protected $indexName;
     protected $indexConfig;
     protected $clientAPI;
-    protected $response;
+    protected $response = ['total' => 0, 'hits' => []];
 
     /**
      * Instantiates the Client Library API
@@ -146,9 +146,13 @@ class MySQLClient implements SearchClientAdaptor, DataSearcher
             $this->clientAPI = $this->clientAPI->filter($andFilters);
         }
 
-        $this->response = $this->clientAPI->toNestedArray();
+        $this->response = ['total' => $this->clientAPI->count()];
 
-        return new ArrayList($this->response);
+        $this->clientAPI = $this->clientAPI->limit("$pageNumber,$pageLength");
+
+        $this->response['hits'] = $this->clientAPI->toNestedArray();
+
+        return new ArrayList($this->response['hits']);
     }
 
     public function createInitialPartialMatch($term)
