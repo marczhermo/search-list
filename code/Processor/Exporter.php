@@ -8,6 +8,7 @@ use SilverStripe\ORM\DataObject;
 use SilverStripe\Core\Injector\Injector;
 use SilverStripe\ORM\DataList;
 use Marcz\Search\Config;
+use SilverStripe\Versioned\Versioned;
 
 class Exporter
 {
@@ -23,12 +24,21 @@ class Exporter
 
     public function export($dataObject)
     {
-        $map      = $dataObject->toMap();
+        $dataClassName = get_class($dataObject);
+        if ($this->isVersioned($dataObject)) {
+            $dataObject = Versioned::get_by_stage(
+                    $dataClassName,
+                    Versioned::LIVE
+                )->byID($dataObject->ID);
+        }
+
         $hasOne   = $dataObject->config()->get('has_one');
         $hasMany  = $dataObject->config()->get('has_many');
         $manyMany = $dataObject->config()->get('many_many');
-        $fields   = DataObject::getSchema()
-            ->databaseFields(get_class($dataObject), $aggregate = false);
+
+        $map    = $dataObject->toMap();
+        $fields = DataObject::getSchema()
+            ->databaseFields($dataClassName, $aggregate = false);
 
         foreach ($fields as $column => $fieldType) {
             if (in_array($fieldType, ['PrimaryKey'])
@@ -123,5 +133,15 @@ class Exporter
         }
 
         return $bulk;
+    }
+
+    /**
+     * Determine if {@see Versioned) extension rules should be applied to this object
+     *
+     * @return bool
+     */
+    protected function isVersioned($dataObject)
+    {
+        return class_exists(Versioned::class) && $dataObject->has_extension(Versioned::class);
     }
 }
