@@ -2,6 +2,8 @@
 
 namespace Marcz\Search\Processor;
 
+use SilverStripe\AssetAdmin\Forms\UploadField;
+use SilverStripe\Assets\File;
 use SilverStripe\Core\Injector\Injectable;
 use SilverStripe\Core\Extensible;
 use SilverStripe\ORM\DataObject;
@@ -54,12 +56,20 @@ class Exporter
             }
 
             $formField = $field->scaffoldFormField();
-            $formField->setValue($map[$column]);
-            $map[$column] = $formField->dataValue();
+            if ($formField instanceof UploadField) {
+                $map[$column] = (int) $map[$column];
+            } else {
+                $formField->setValue($map[$column]);
+                $map[$column] = $formField->dataValue();
+            }
         }
 
         foreach ($hasOne as $column => $className) {
-            $map[$column] = $dataObject->{$column}()->getTitle();
+            $oneItem = $dataObject->{$column}();
+            if ($oneItem instanceof File) {
+                $map[$column . '_URL'] = $oneItem->getAbsoluteURL();
+            }
+            $map[$column] = $oneItem->getTitle();
         }
 
         foreach ($hasMany as $column => $className) {
