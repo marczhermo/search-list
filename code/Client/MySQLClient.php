@@ -13,7 +13,7 @@ class MySQLClient implements SearchClientAdaptor, DataSearcher
     protected $indexName;
     protected $indexConfig;
     protected $clientAPI;
-    protected $response = ['total' => 0, 'hits' => []];
+    protected $response = ['_total' => 0, 'hits' => []];
 
     /**
      * Instantiates the Client Library API
@@ -104,39 +104,40 @@ class MySQLClient implements SearchClientAdaptor, DataSearcher
         $columns     = array_flip($attribs);
         $foreignKeys = array_intersect_key($foreign, $columns);
 
-        foreach ($foreignKeys as $columnName => $dataClass) {
-            $filterName  = 'PartialMatch';
-            $filterValue = $term;
-            $titleOrName = '';
+        foreach ($filters as $filter) {
+            $columnFilters  = explode(':', key($filter));
+            $filterKey      = array_shift($columnFilters);
+            $filterName     = implode(':', $columnFilters);
+            $filterValue    = current($filter);
 
-            if ($schema->fieldSpec($dataClass, 'Title')) {
-                $titleOrName = 'Title';
-            }
+            foreach ($foreignKeys as $columnName => $dataClass) {
+                if ($columnName !== $filterKey) {
+                    continue;
+                }
+                $filterName  = $filterName ?: 'PartialMatch';
+                $filterValue = $term;
+                $titleOrName = '';
 
-            if ($schema->fieldSpec($dataClass, 'Name')) {
-                $titleOrName = 'Name';
-            }
+                if ($schema->fieldSpec($dataClass, 'Title')) {
+                    $titleOrName = 'Title';
+                }
 
-            if (!$titleOrName) {
+                if ($schema->fieldSpec($dataClass, 'Name')) {
+                    $titleOrName = 'Name';
+                }
+
+                if (!$titleOrName) {
+                    continue;
+                }
+
+                $orFilters[$filterKey . '.' . $titleOrName . ':' . $filterName] = $filterValue;
                 continue;
             }
 
-            foreach ($filters as $filter) {
-                $columnFilters  = explode(':', key($filter));
-                $filterKey      = array_shift($columnFilters);
-                if ($columnName === $filterKey) {
-                    $filterName  = implode(':', $columnFilters);
-                    $filterValue = current($filter);
-                    break;
-                }
-            }
-
-            if ($filterName === 'PartialMatch') {
-                $orFilters[$columnName . '.' . $titleOrName . ':' . $filterName] = $filterValue;
-            } else {
-                $andFilters[$columnName . '.' . $titleOrName . ':' . $filterName] = $filterValue;
-            }
+            $filterName = $filterName ? ':' . $filterName : '';
+            $andFilters[$filterKey . $filterName] = $filterValue;
         }
+
 
         if ($orFilters) {
             $this->clientAPI = $this->clientAPI->filterAny($orFilters);
@@ -146,11 +147,11 @@ class MySQLClient implements SearchClientAdaptor, DataSearcher
             $this->clientAPI = $this->clientAPI->filter($andFilters);
         }
 
-        $this->response = ['total' => $this->clientAPI->count()];
+        $this->response = ['_total' => $this->clientAPI->count()];
 
         $this->clientAPI = $this->clientAPI->limit("$pageNumber,$pageLength");
 
-        $this->response['hits'] = $this->clientAPI->toNestedArray();
+        $this->response['hits'] = $this->clientAPI->toArray();
 
         return new ArrayList($this->response['hits']);
     }

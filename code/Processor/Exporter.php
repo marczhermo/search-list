@@ -51,6 +51,7 @@ class Exporter
 
             if ($fieldType === 'ForeignKey') {
                 $field = Injector::inst()->create($fieldType, $column, $dataObject);
+                $map[$column] = (int) $map[$column];
             } else {
                 $field = Injector::inst()->create($fieldType);
             }
@@ -68,8 +69,10 @@ class Exporter
             $oneItem = $dataObject->{$column}();
             if ($oneItem instanceof File) {
                 $map[$column . '_URL'] = $oneItem->getAbsoluteURL();
+                $map[$column . '_Title'] = $oneItem->getTitle();
+            } else {
+                $map[$column] = $oneItem->getTitle();
             }
-            $map[$column] = $oneItem->getTitle();
         }
 
         foreach ($hasMany as $column => $className) {
