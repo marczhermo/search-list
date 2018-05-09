@@ -19,7 +19,7 @@ class SafeguardMember extends Extension
         'FailedLoginCount'
     ];
 
-    public function updateExport(&$data)
+    public function updateExport(&$data, &$clientClassName)
     {
         foreach ($this->unsafeColumns as $column) {
             if (isset($data[$column])) {

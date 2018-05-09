@@ -131,7 +131,7 @@ class MySQLClient implements SearchClientAdaptor, DataSearcher
                 }
 
                 $orFilters[$filterKey . '.' . $titleOrName . ':' . $filterName] = $filterValue;
-                continue;
+                break;
             }
 
             $filterName = $filterName ? ':' . $filterName : '';

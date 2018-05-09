@@ -24,7 +24,7 @@ class Exporter
         $this->className = $className;
     }
 
-    public function export($dataObject)
+    public function export($dataObject, $clientClassName = null)
     {
         $dataClassName = get_class($dataObject);
         if ($this->isVersioned($dataObject)) {
@@ -104,13 +104,13 @@ class Exporter
             }
         }
 
-        $this->extend('updateExport', $map);
+        $this->extend('updateExport', $map, $clientClassName);
         $dataObject->destroy();
 
         return $map;
     }
 
-    public function bulkExport($className, $startAt = 0, $max = 0)
+    public function bulkExport($className, $startAt = 0, $max = 0, $clientClassName = null)
     {
         $list   = new DataList($className);
         $total  = $list->count();
@@ -127,7 +127,7 @@ class Exporter
                     break;
                 }
 
-                $bulk[] = $this->export($page);
+                $bulk[] = $this->export($page, $clientClassName);
                 $page->destroy();
                 unset($page);
                 $count++;
