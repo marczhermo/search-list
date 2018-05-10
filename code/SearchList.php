@@ -101,4 +101,9 @@ class SearchList extends ViewableData
 
         return $this;
     }
+
+    public function sql()
+    {
+        return $this->clientAPI ? $this->clientAPI->sql() : 'Run fetch() first.';
+    }
 }

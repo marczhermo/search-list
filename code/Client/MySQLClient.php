@@ -14,6 +14,7 @@ class MySQLClient implements SearchClientAdaptor, DataSearcher
     protected $indexConfig;
     protected $clientAPI;
     protected $response = ['_total' => 0, 'hits' => []];
+    protected $rawQuery;
 
     /**
      * Instantiates the Client Library API
@@ -152,6 +153,7 @@ class MySQLClient implements SearchClientAdaptor, DataSearcher
         $this->clientAPI = $this->clientAPI->limit("$pageNumber,$pageLength");
 
         $this->response['hits'] = $this->clientAPI->toArray();
+        $this->rawQuery = $this->clientAPI->sql();
 
         return new ArrayList($this->response['hits']);
     }
@@ -171,5 +173,10 @@ class MySQLClient implements SearchClientAdaptor, DataSearcher
             },
             []
         );
+    }
+
+    public function sql()
+    {
+        return $this->rawQuery;
     }
 }
