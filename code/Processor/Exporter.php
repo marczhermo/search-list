@@ -27,7 +27,7 @@ class Exporter
     public function export($dataObject, $clientClassName = null)
     {
         $dataClassName = get_class($dataObject);
-        if ($this->isVersioned($dataObject)) {
+        if ($dataObject->has_extension(Versioned::class)) {
             $dataObject = Versioned::get_by_stage(
                     $dataClassName,
                     Versioned::LIVE
@@ -146,15 +146,5 @@ class Exporter
         }
 
         return $bulk;
-    }
-
-    /**
-     * Determine if {@see Versioned) extension rules should be applied to this object
-     *
-     * @return bool
-     */
-    protected function isVersioned($dataObject)
-    {
-        return class_exists(Versioned::class) && $dataObject->has_extension(Versioned::class);
     }
 }
