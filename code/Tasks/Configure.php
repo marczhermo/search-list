@@ -45,8 +45,12 @@ NOCLIENT;
             foreach ($clients as $client) {
                 $className = $client->getField('class');
                 $clientObj = Injector::inst()->create($className);
-                $clientObj->createIndex($index['name']);
                 $message .= sprintf('<p>Using client "%s"</p>', $className);
+                try {
+                    $clientObj->createIndex($index['name']);
+                } catch(\Exception $e) {
+                    $message .= sprintf('<p>Error client "%s" : "%s"</p>', $className, $e->getMessage());
+                }
             }
         }
 
