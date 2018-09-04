@@ -1,6 +1,12 @@
 ---
 Name: searchlist
 ---
+SilverStripe\ORM\DataObject:
+  extensions:
+    - Marcz\Search\Extensions\SearchDataListener
+SilverStripe\CMS\Controllers\ContentController:
+  extensions:
+    - Marcz\Search\Extensions\SearchContentExtension
 SilverStripe\CMS\Model\SiteTree:
   extensions:
     - Marcz\Search\Extenstions\SearchListSiteTree
