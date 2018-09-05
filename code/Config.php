@@ -26,12 +26,12 @@ class Config
     public static function resolveIndex($indexName = null)
     {
         $indices = ArrayList::create(self::config()->get('indices'));
-        $index   = $indices->filter(['name' => $indexName])->first();
+        $index   = $indices->find('name', $indexName);
 
         return $index ? $index['name'] : $indices->first()['name'];
     }
 
-    public static function resolveClient($clientName)
+    public static function resolveClient($clientName = null)
     {
         $request          = Injector::inst()->get(HTTPRequest::class);
         $session          = $request->getSession();
@@ -39,7 +39,7 @@ class Config
         $rememberedClient = $session->get(self::config()->get('session_key'));
 
         if ($clientName) {
-            $client = $clients->filter(['name' => $clientName])->first();
+            $client = $clients->find('name', $clientName);
             if (!$client) {
                 $noClient = <<<NOCLIENT
 Error: No clients configurations. See example below:
@@ -58,12 +58,12 @@ NOCLIENT;
 
             $requestedClient = $client['name'];
             $session->set(self::config()->get('session_key'), $requestedClient);
-        } else {
-            $requestedClient = $rememberedClient;
+
+            return $requestedClient;
         }
 
-        if ($requestedClient) {
-            return $requestedClient;
+        if ($rememberedClient) {
+            return $rememberedClient;
         }
 
         $requestedClient = $clients->first()['name'];
@@ -74,11 +74,8 @@ NOCLIENT;
 
     public static function getCurrentClient()
     {
-        $request          = Injector::inst()->get(HTTPRequest::class);
-        $session          = $request->getSession();
-        $rememberedClient = $session->get(self::config()->get('session_key'));
+        $clients = ArrayList::create(self::config()->get('clients'));
 
-        return ArrayList::create(self::config()->get('clients'))
-            ->filter(['name' => $session->get(self::config()->get('session_key'))])->first();
+        return $clients->find('name', self::resolveClient());
     }
 }
