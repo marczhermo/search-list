@@ -29,11 +29,15 @@ class SearchList extends ViewableData
     public function setPageNumber($pageNumber)
     {
         $this->pageNumber = (int) $pageNumber;
+
+        return $this;
     }
 
     public function setPageLength($pageLength)
     {
         $this->pageLength = (int) $pageLength;
+
+        return $this;
     }
 
     public function fetch()
