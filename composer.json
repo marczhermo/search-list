@@ -28,7 +28,7 @@
     },
     "autoload": {
         "psr-4": {
-            "Marcz\\Search\\": "code/",
+            "Marcz\\Search\\": "src/",
             "Marcz\\Search\\Tests\\": "tests/php/"
         }
     },
