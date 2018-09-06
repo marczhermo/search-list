@@ -1,5 +1,11 @@
 # Search List
 
+[![Build Status](https://travis-ci.org/marczhermo/search-list.svg?branch=master)](https://travis-ci.org/marczhermo/search-list)
+[![Latest Stable Version](https://poser.pugx.org/marczhermo/search-list/v/stable)](https://packagist.org/packages/marczhermo/search-list)
+[![codecov](https://codecov.io/gh/marczhermo/search-list/branch/master/graph/badge.svg)](https://codecov.io/gh/marczhermo/search-list)
+[![Total Downloads](https://poser.pugx.org/marczhermo/search-list/downloads)](https://packagist.org/packages/marczhermo/search-list)
+[![License](https://poser.pugx.org/marczhermo/search-list/license)](https://packagist.org/packages/marczhermo/search-list)
+
 ## Overview
 
 More contents soon.
