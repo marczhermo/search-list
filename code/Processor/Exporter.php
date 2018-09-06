@@ -29,9 +29,9 @@ class Exporter
         $dataClassName = get_class($dataObject);
         if ($dataObject->has_extension(Versioned::class)) {
             $dataObject = Versioned::get_by_stage(
-                    $dataClassName,
-                    Versioned::LIVE
-                )->byID($dataObject->ID);
+                $dataClassName,
+                Versioned::LIVE
+            )->byID($dataObject->ID);
         }
 
         $hasOne   = $dataObject->config()->get('has_one');

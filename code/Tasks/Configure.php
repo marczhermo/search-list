@@ -48,7 +48,7 @@ NOCLIENT;
                 $message .= sprintf('<p>Using client "%s"</p>', $className);
                 try {
                     $clientObj->createIndex($index['name']);
-                } catch(\Exception $e) {
+                } catch (\Exception $e) {
                     $message .= sprintf('<p>Error client "%s" : "%s"</p>', $className, $e->getMessage());
                 }
             }

@@ -105,5 +105,4 @@ class SearchListTest extends SapphireTest
             ->limit("0,20");
         $this->assertEquals($page->sql(), $search->sql());
     }
-
 }
