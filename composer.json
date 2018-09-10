@@ -10,8 +10,8 @@
         "admin"
     ],
     "require": {
-        "silverstripe/cms": "3.6.6@stable",
-        "silverstripe/framework": "3.6.6@stable"
+        "silverstripe/cms": "~3.6",
+        "silverstripe/framework": "~3.6"
     },
     "require-dev": {
         "phpunit/phpunit": "^3 || ^4 || ^5"

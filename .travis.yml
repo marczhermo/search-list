@@ -20,14 +20,12 @@ matrix:
       env: DB=MYSQL
 
 before_script:
-  - composer self-update || true
   - phpenv rehash
   - phpenv config-rm xdebug.ini
-  - composer validate
+  - composer self-update || true
   - git clone git://github.com/silverstripe/silverstripe-travis-support.git ~/travis-support
-  - php ~/travis-support/travis_setup.php --source `pwd` --target ~/builds/ss
+  - php ~/travis-support/travis_setup.php --source `pwd` --target ~/builds/ss --require silverstripe/installer
   - cd ~/builds/ss
-  - composer install --prefer-dist
 
 script:
   - vendor/bin/phpunit $MODULE_PATH/tests
