@@ -2,11 +2,11 @@
 
 namespace Marcz\Search\Tests;
 
-use SilverStripe\Dev\SapphireTest;
+use SapphireTest;
 use Marcz\Search\Config as SearchConfig;
-use SilverStripe\Core\Injector\Injector;
-use SilverStripe\Control\HTTPRequest;
-use SilverStripe\Control\Session;
+use Injector;
+use SS_HTTPRequest;
+use Session;
 
 /**
  * Config Test
@@ -19,8 +19,8 @@ class ConfigTest extends SapphireTest
     {
         parent::setUp();
         // Created a singleton HTTPRequest with Session attached just like normal browsing
-        $request = Injector::inst()->get(HTTPRequest::class, true, ['GET', '/']);
-        $request->setSession(new Session([]));
+        $request = Injector::inst()->get(SS_HTTPRequest::class, true, ['GET', '/']);
+        // $request->setSession(new Session([]));
     }
 
     public function testDetails()
@@ -84,8 +84,8 @@ class ConfigTest extends SapphireTest
         $this->assertEquals('MySQL', SearchConfig::resolveClient());
 
         // Existing Session by other sources
-        $request = Injector::inst()->get(HTTPRequest::class);
-        $session = $request->getSession();
+        $request = Injector::inst()->get(SS_HTTPRequest::class);
+        $session = SearchConfig::currentSession();
         $session->set(SearchConfig::config()->get('session_key'), 'CustomClient');
         $this->assertEquals('CustomClient', SearchConfig::resolveClient());
 

@@ -2,21 +2,16 @@
 
 namespace Marcz\Search\Processor;
 
-use SilverStripe\AssetAdmin\Forms\UploadField;
-use SilverStripe\Assets\File;
-use SilverStripe\Core\Injector\Injectable;
-use SilverStripe\Core\Extensible;
-use SilverStripe\ORM\DataObject;
-use SilverStripe\Core\Injector\Injector;
-use SilverStripe\ORM\DataList;
+use UploadField;
+use File;
+use Object;
+use DataObject;
+use DataList;
 use Marcz\Search\Config;
-use SilverStripe\Versioned\Versioned;
+use Versioned;
 
-class Exporter
+class Exporter extends Object
 {
-    use Injectable;
-    use Extensible;
-
     protected $className;
 
     public function setClassName($className)
@@ -30,17 +25,16 @@ class Exporter
         if ($dataObject->has_extension(Versioned::class)) {
             $dataObject = Versioned::get_by_stage(
                 $dataClassName,
-                Versioned::LIVE
+                'Live'
             )->byID($dataObject->ID);
         }
 
-        $hasOne   = $dataObject->config()->get('has_one');
-        $hasMany  = $dataObject->config()->get('has_many');
-        $manyMany = $dataObject->config()->get('many_many');
+        $hasOne   = (array) $dataObject->config()->get('has_one');
+        $hasMany  = (array) $dataObject->config()->get('has_many');
+        $manyMany = (array) $dataObject->config()->get('many_many');
 
         $map    = $dataObject->toMap();
-        $fields = DataObject::getSchema()
-            ->databaseFields($dataClassName, $aggregate = true);
+        $fields = Config::databaseFields($dataClassName);
 
         foreach ($fields as $column => $fieldType) {
             if (in_array($fieldType, ['PrimaryKey'])
@@ -113,8 +107,7 @@ class Exporter
     public function bulkExport($className, $startAt = 0, $max = 0, $clientClassName = null)
     {
         $list   = new DataList($className);
-        $fields = DataObject::getSchema()
-            ->databaseFields($className, $aggregate = true);
+        $fields = Config::databaseFields($className);
         if (isset($fields['ShowInSearch'])) {
             $list = $list->filter('ShowInSearch', true);
         }

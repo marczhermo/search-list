@@ -2,10 +2,10 @@
 
 namespace Marcz\Search\Extensions;
 
-use SilverStripe\ORM\DataExtension;
+use DataExtension;
 use Marcz\Search\Config;
-use SilverStripe\ORM\ArrayList;
-use SilverStripe\Core\Injector\Injector;
+use ArrayList;
+use Injector;
 
 class SearchDataListener extends DataExtension
 {

@@ -2,9 +2,9 @@
 
 namespace Marcz\Search;
 
-use SilverStripe\View\ViewableData;
+use ViewableData;
 use Marcz\Search\Config as SearchConfig;
-use SilverStripe\Core\Injector\Injector;
+use Injector;
 use InvalidArgumentException;
 use Exception;
 
@@ -55,6 +55,7 @@ class SearchList extends ViewableData
                 $this->pageLength
             );
         } catch (Exception $e) {
+            fwrite(STDERR, print_r(['Exception', $e->getLine(), $e->getFile()], true));
             return $e->getMessage();
         }
 

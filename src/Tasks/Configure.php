@@ -2,10 +2,10 @@
 
 namespace Marcz\Search\Tasks;
 
-use SilverStripe\Dev\BuildTask;
+use BuildTask;
 use Marcz\Search\Config;
-use SilverStripe\ORM\ArrayList;
-use SilverStripe\Core\Injector\Injector;
+use ArrayList;
+use Injector;
 
 class Configure extends BuildTask
 {

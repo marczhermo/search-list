@@ -2,13 +2,13 @@
 
 namespace Marcz\Search\Tests;
 
-use SilverStripe\Dev\SapphireTest;
+use SapphireTest;
 use Marcz\Search\Config as SearchConfig;
-use SilverStripe\Core\Injector\Injector;
-use SilverStripe\Control\HTTPRequest;
-use SilverStripe\Control\Session;
+use Injector;
+use SS_HTTPRequest;
+use Session;
 use Marcz\Search\SearchList;
-use SilverStripe\ORM\ArrayList;
+use ArrayList;
 use Page;
 
 /**
@@ -22,9 +22,9 @@ class SearchListTest extends SapphireTest
     {
         parent::setUp();
         // $_REQUEST['showqueries'] = 'inline';
-        // Created a singleton HTTPRequest with Session attached just like normal browsing
-        $request = Injector::inst()->get(HTTPRequest::class, true, ['GET', '/']);
-        $request->setSession(new Session([]));
+        // Created a singleton SS_HTTPRequest with Session attached just like normal browsing
+        $request = Injector::inst()->get(SS_HTTPRequest::class, true, ['GET', '/']);
+        // $request->setSession(new Session([]));
     }
 
     public function testConstructor()

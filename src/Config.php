@@ -2,17 +2,33 @@
 
 namespace Marcz\Search;
 
-use SilverStripe\Core\Injector\Injectable;
-use SilverStripe\Core\Config\Configurable;
-use SilverStripe\ORM\ArrayList;
-use SilverStripe\Control\HTTPRequest;
-use SilverStripe\Core\Injector\Injector;
+use Object;
+use DataObject;
+use Controller;
+use Session;
+use ArrayList;
+use SS_HTTPRequest;
+use Injector;
 use Exception;
 
-class Config
+class Config extends Object
 {
-    use Injectable, Configurable;
     private static $session_key = 'SearchListRememberedClient';
+
+    protected static $default_session = null;
+
+    public static function currentSession()
+    {
+        if (Controller::has_curr()) {
+            return Controller::curr()->getSession();
+        } else {
+            if (!self::$default_session) {
+                self::$default_session = Injector::inst()->create('Session', isset($_SESSION) ? $_SESSION : array());
+            }
+
+            return self::$default_session;
+        }
+    }
 
     public function details()
     {
@@ -33,8 +49,8 @@ class Config
 
     public static function resolveClient($clientName = null)
     {
-        $request          = Injector::inst()->get(HTTPRequest::class);
-        $session          = $request->getSession();
+        $request          = Injector::inst()->get(SS_HTTPRequest::class);
+        $session          = self::currentSession();
         $clients          = ArrayList::create(self::config()->get('clients'));
         $rememberedClient = $session->get(self::config()->get('session_key'));
 
@@ -77,5 +93,16 @@ NOCLIENT;
         $clients = ArrayList::create(self::config()->get('clients'));
 
         return $clients->find('name', self::resolveClient());
+    }
+
+    public static function databaseFields($className, $parentClass = 'SiteTree')
+    {
+        $fields = DataObject::database_fields($className);
+        if (is_subclass_of($className, $parentClass)) {
+            $parentFields = DataObject::database_fields($parentClass);
+            $fields = array_merge((array) $parentFields, (array) $fields);
+        }
+
+        return $fields;
     }
 }

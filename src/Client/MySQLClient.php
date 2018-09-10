@@ -2,11 +2,11 @@
 
 namespace Marcz\Search\Client;
 
-use SilverStripe\ORM\DataList;
-use SilverStripe\ORM\ArrayList;
-use SilverStripe\ORM\DataObject;
+use DataList;
+use ArrayList;
+use DataObject;
 use Marcz\Search\Config;
-use SilverStripe\Core\Injector\Injector;
+use Injector;
 
 class MySQLClient implements SearchClientAdaptor, DataSearcher
 {
@@ -90,18 +90,16 @@ class MySQLClient implements SearchClientAdaptor, DataSearcher
     public function search($term, $filters, $pageNumber, $pageLength)
     {
         $attribs  = $this->indexConfig['searchableAttributes'];
-        $schema   = DataObject::getSchema();
-        $fields   = $schema->databaseFields($this->indexConfig['class']);
+        $fields   = Config::databaseFields($this->indexConfig['class']);
         $object   = Injector::inst()->create($this->indexConfig['class']);
         $hasOne   = $object->config()->get('has_one');
         $hasMany  = $object->config()->get('has_many');
         $manyMany = $object->config()->get('many_many');
 
-        $foreign    = array_merge($hasOne, $hasMany, $manyMany);
+        $foreign    = array_merge((array) $hasOne, (array) $hasMany, (array) $manyMany);
         $orFilters  = $this->createInitialPartialMatch($term);
         $andFilters = [];
 
-        $fieldSpecs  = $schema->fieldSpecs($this->indexConfig['class']);
         $columns     = array_flip($attribs);
         $foreignKeys = array_intersect_key($foreign, $columns);
 
@@ -162,8 +160,7 @@ class MySQLClient implements SearchClientAdaptor, DataSearcher
     {
         $attribs = $this->indexConfig['searchableAttributes'];
         $columns = array_flip($attribs);
-        $schema  = DataObject::getSchema();
-        $fields  = $schema->databaseFields($this->indexConfig['class']);
+        $fields   = Config::databaseFields($this->indexConfig['class']);
 
         return array_reduce(
             array_keys(array_intersect_key($fields, $columns)),
@@ -178,5 +175,16 @@ class MySQLClient implements SearchClientAdaptor, DataSearcher
     public function sql()
     {
         return $this->rawQuery;
+    }
+
+    public function databaseFields($className, $parentClass = 'SiteTree')
+    {
+        $fields = DataObject::database_fields($className);
+        if (is_subclass_of($className, $parentClass)) {
+            $parentFields = DataObject::database_fields($parentClass);
+            $fields = array_merge((array) $parentFields, (array) $fields);
+        }
+
+        return $fields;
     }
 }

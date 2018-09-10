@@ -2,7 +2,7 @@
 
 namespace Marcz\Search\Extensions;
 
-use SilverStripe\Core\Extension;
+use Extension;
 
 class SafeguardMember extends Extension
 {

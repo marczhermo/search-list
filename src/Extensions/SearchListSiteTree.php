@@ -2,7 +2,7 @@
 
 namespace Marcz\Search\Extenstions;
 
-use SilverStripe\CMS\Model\SiteTreeExtension;
+use SiteTreeExtension;
 
 class SearchListSiteTree extends SiteTreeExtension
 {

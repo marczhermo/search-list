@@ -2,7 +2,7 @@
 
 namespace Marcz\Search\Extensions;
 
-use SilverStripe\Core\Extension;
+use Extension;
 use Marcz\Search\SearchList;
 
 class SearchContentExtension extends Extension
