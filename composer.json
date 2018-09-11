@@ -20,10 +20,7 @@
         "expose": [
             "client/dist",
             "client/lang"
-        ],
-        "branch-alias": {
-            "3.x-dev": "v0.1.0"
-        }
+        ]
     },
     "autoload": {
         "psr-4": {
