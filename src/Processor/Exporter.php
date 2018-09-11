@@ -22,7 +22,7 @@ class Exporter extends Object
     public function export($dataObject, $clientClassName = null)
     {
         $dataClassName = get_class($dataObject);
-        if ($dataObject->has_extension(Versioned::class)) {
+        if ($dataObject->hasExtension(Versioned::class)) {
             $dataObject = Versioned::get_by_stage(
                 $dataClassName,
                 'Live'
