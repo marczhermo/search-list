@@ -1,7 +1,7 @@
 {
     "name": "marczhermo/search-list",
     "description": "SilverStripe SearchList",
-    "type": "silverstripe-vendormodule",
+    "type": "silverstripe-module",
     "license": "BSD-3-Clause",
     "keywords": [
         "searchlist",

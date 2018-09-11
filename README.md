@@ -8,7 +8,103 @@
 
 ## Overview
 
-More contents soon.
+This module provides a way to abstract different types of search engines which interfaces as a swappable client module.
+
+The goal is to use the familiar/existing model filters as modifiers when searching for data.
+
+Has built-in search client in the form of MySQL as the basis for third-party clients like Algolia, ElasticSearch, Swiftype and Solr for module implementation.
+
+Currently supporting the following client modules:
+- swiftype-search
+- algolia-search
+- elastic-serch
+
+Todo:
+- solr-search
+
+## Usage
+
+The example below provides a way to convert existing DataList like we used to fetch database results.
+
+````
+// Controller method using familiar DataList concrete implementation
+$properties = Property::get();
+$properties = $properties->filter(
+    ['Title:PartialMatch'] => $request->getVar('Keywords');
+);
+$properties = $properties->filter([
+    'AvailableStart:LessThanOrEqual' => $startDate,
+    'AvailableEnd:GreaterThanOrEqual' => $endDate
+]);
+
+return ['Results' => $properties]; // DataList
+````
+
+Using this module we provide the following concrete implementation.
+
+````
+// Controller method using the module's interface
+$properties = $this->createSearch(
+    $request->getVar('Keywords'), 'Properties', 'Swiftype'
+);
+$properties->filter([
+    'AvailableStart:LessThanOrEqual' => $startDate,
+    'AvailableEnd:GreaterThanOrEqual' => $endDate
+]);
+
+return ['Results' =>$properties->fetch()]; // ArrayList
+````
+
+## Installation
+
+SilverStripe 3
+
+````
+composer require marczhermo/search-list:^0.1
+````
+
+SilverStripe 4
+
+````
+composer require marczhermo/search-list
+````
+
+## Configuration
+On your config.yml, the example below provides details for search engine client to gather data from your Model.
+````
+Marcz\Search\Config:
+  indices:
+    - name: 'FAQ'
+      class: 'FAQ'
+      has_one: true
+      has_many: true
+      many_many: true
+      searchableAttributes:
+        - 'Question'
+        - 'Answer'
+        - 'Keywords'
+        - 'Category'
+      attributesForFaceting:
+        - 'Keywords'
+        - 'Category'
+
+````
+
+## Additional Tasks
+
+- SearchList: Configure DataObjects to Indices
+- Creates and initialise indices using the client API.
+
+````
+/dev/tasks/SearchList_Configure
+````
+
+- SearchList: Exports DataObjects into Json or XML documents
+- Creates a batch of queue jobs for sending bulk records to client API.
+
+````
+/dev/tasks/SearchList_DataExporter
+````
 
 ## Versioning
 
