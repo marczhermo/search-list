@@ -3,7 +3,8 @@
 namespace Marcz\Search\Tasks;
 
 use BuildTask;
-use Marcz\Search\Config;
+use Config;
+use Marcz\Search\Config as SearchConfig;
 use ArrayList;
 use Injector;
 
@@ -17,8 +18,8 @@ class DataExporter extends BuildTask
 
     public function run($request)
     {
-        $indices = Config::config()->get('indices');
-        $clients = ArrayList::create(Config::config()->get('clients'))
+        $indices = SearchConfig::config()->get('indices');
+        $clients = ArrayList::create(SearchConfig::config()->get('clients'))
                     ->filter([
                         'write'  => true,
                         'export' => ['json', 'xml'],
@@ -42,6 +43,11 @@ NOCLIENT;
 
         $message = '';
         foreach ($indices as $index) {
+            if (Config::inst()->get($index['class'], 'disabledIndex')) {
+                $message .= sprintf('<p>Indexing, "%s" for class "%s" is disabled.</p>', $index['name'], $index['class']);
+                continue;
+            }
+
             $message .= sprintf('<p>Creating export job for class "%s"</p>', $index['class']);
             foreach ($clients as $client) {
                 $className = $client->getField('class');

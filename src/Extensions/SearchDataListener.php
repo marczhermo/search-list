@@ -3,7 +3,8 @@
 namespace Marcz\Search\Extensions;
 
 use DataExtension;
-use Marcz\Search\Config;
+use Config;
+use Marcz\Search\Config as SearchConfig;
 use ArrayList;
 use Injector;
 
@@ -14,8 +15,8 @@ class SearchDataListener extends DataExtension
 
     protected function setUp()
     {
-        $this->indices = Config::config()->get('indices');
-        $this->clients = ArrayList::create(Config::config()->get('clients'))
+        $this->indices = SearchConfig::config()->get('indices');
+        $this->clients = ArrayList::create(SearchConfig::config()->get('clients'))
                     ->filter([
                         'write'  => true,
                     ]);
@@ -36,6 +37,10 @@ class SearchDataListener extends DataExtension
                 continue;
             }
 
+            if (Config::inst()->get($index['class'], 'disabledIndex')) {
+                continue;
+            }
+
             foreach ($this->clients as $client) {
                 $className = $client->getField('class');
                 $clientObj = Injector::inst()->create($className);
@@ -52,6 +57,10 @@ class SearchDataListener extends DataExtension
 
         foreach ($this->indices as $index) {
             if ($index['class'] !== $this->owner->ClassName) {
+                continue;
+            }
+
+            if (Config::inst()->get($index['class'], 'disabledIndex')) {
                 continue;
             }
 
