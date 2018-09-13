@@ -22,7 +22,19 @@ class ConfigTest extends SapphireTest
         parent::setUp();
         // Created a singleton HTTPRequest with Session attached just like normal browsing
         $request = Injector::inst()->get(SS_HTTPRequest::class, true, ['GET', '/']);
-        // $request->setSession(new Session([]));
+        $this->searchConfigYmlFile();
+    }
+
+    protected function searchConfigYmlFile()
+    {
+        $fixture = Injector::inst()->create('YamlFixture', 'search-list/tests/fixture/search-config.yml');
+        $parser = new Spyc();
+        $fixtureContent = $parser->loadFile($fixture->getFixtureFile());
+        Config::inst()->update(
+            SearchConfig::class,
+            'indices',
+            $fixtureContent['Marcz\Search\Config']['indices']
+        );
     }
 
     public function testDetails()
@@ -33,15 +45,6 @@ class ConfigTest extends SapphireTest
         $this->assertArrayHasKey('clients', $config);
         $this->assertArrayHasKey('batch_length', $config);
 
-        $this->assertEmpty($config['indices']);
-
-        $factory = Injector::inst()->create('FixtureFactory');
-        $fixture = Injector::inst()->create('YamlFixture', 'search-list/tests/fixture/search-config.yml');
-        $parser = new Spyc();
-        $fixtureContent = $parser->loadFile($fixture->getFixtureFile());
-        Config::inst()->update(SearchConfig::class, 'indices', $fixtureContent['Marcz\Search\Config']['indices'][0]);
-
-        $config = SearchConfig::create()->details();
         $this->assertContains(
             [
                 'name' => 'Pages',

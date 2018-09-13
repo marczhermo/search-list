@@ -10,6 +10,8 @@ use Session;
 use Marcz\Search\SearchList;
 use ArrayList;
 use Page;
+use Spyc;
+use Config;
 
 /**
  * Config Test
@@ -24,7 +26,19 @@ class SearchListTest extends SapphireTest
         // $_REQUEST['showqueries'] = 'inline';
         // Created a singleton SS_HTTPRequest with Session attached just like normal browsing
         $request = Injector::inst()->get(SS_HTTPRequest::class, true, ['GET', '/']);
-        // $request->setSession(new Session([]));
+        $this->searchConfigYmlFile();
+    }
+
+    protected function searchConfigYmlFile()
+    {
+        $fixture = Injector::inst()->create('YamlFixture', 'search-list/tests/fixture/search-config.yml');
+        $parser = new Spyc();
+        $fixtureContent = $parser->loadFile($fixture->getFixtureFile());
+        Config::inst()->update(
+            SearchConfig::class,
+            'indices',
+            $fixtureContent['Marcz\Search\Config']['indices']
+        );
     }
 
     public function testConstructor()

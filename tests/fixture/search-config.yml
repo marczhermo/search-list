@@ -13,4 +13,4 @@ Marcz\Search\Config:
         - 'MetaDescription'
       attributesForFaceting:
         - 'Title'
-        - 'ShowInSearch'#
+        - 'ShowInSearch'
