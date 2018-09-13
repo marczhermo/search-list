@@ -7,6 +7,8 @@ use Marcz\Search\Config as SearchConfig;
 use Injector;
 use SS_HTTPRequest;
 use Session;
+use Spyc;
+use Config;
 
 /**
  * Config Test
@@ -26,15 +28,25 @@ class ConfigTest extends SapphireTest
     public function testDetails()
     {
         $config = SearchConfig::create()->details();
+
         $this->assertArrayHasKey('indices', $config);
         $this->assertArrayHasKey('clients', $config);
         $this->assertArrayHasKey('batch_length', $config);
 
+        $this->assertEmpty($config['indices']);
+
+        $factory = Injector::inst()->create('FixtureFactory');
+        $fixture = Injector::inst()->create('YamlFixture', 'search-list/tests/fixture/search-config.yml');
+        $parser = new Spyc();
+        $fixtureContent = $parser->loadFile($fixture->getFixtureFile());
+        Config::inst()->update(SearchConfig::class, 'indices', $fixtureContent['Marcz\Search\Config']['indices'][0]);
+
+        $config = SearchConfig::create()->details();
         $this->assertContains(
             [
                 'name' => 'Pages',
                 'class' => 'Page',
-                'crawlBased' => true,
+                'crawlBased' => '1',
                 'has_one' => '1',
                 'has_many' => '1',
                 'many_many' => '1',

@@ -14,6 +14,17 @@ use Exception;
 class Config extends Object
 {
     private static $session_key = 'SearchListRememberedClient';
+    private static $batch_length = 100;
+    private static $indices = [];
+    private static $clients = [
+        [
+            'name' => 'MySQL',
+            'write' => false,
+            'delete' => false,
+            'export' => false,
+            'class' => 'Marcz\Search\Client\MySQLClient',
+        ]
+    ];
 
     protected static $default_session = null;
 

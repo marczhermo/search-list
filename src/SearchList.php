@@ -55,7 +55,6 @@ class SearchList extends ViewableData
                 $this->pageLength
             );
         } catch (Exception $e) {
-            fwrite(STDERR, print_r(['Exception', $e->getLine(), $e->getFile()], true));
             return $e->getMessage();
         }
 

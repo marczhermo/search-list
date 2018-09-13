@@ -13,25 +13,3 @@ SiteTree:
 Marcz\Search\Processor\Exporter:
   extensions:
     - Marcz\Search\Extensions\SafeguardMember
-Marcz\Search\Config:
-  batch_length: 100
-  indices:
-    - name: 'Pages'
-      class: 'Page'
-      crawlBased: true
-      has_one: true
-      has_many: true
-      many_many: true
-      searchableAttributes:
-        - 'Title'
-        - 'Content'
-        - 'MetaDescription'
-      attributesForFaceting:
-        - 'Title'
-        - 'ShowInSearch'
-  clients:
-    - name: 'MySQL'
-      write: false
-      delete: false
-      export: false
-      class: 'Marcz\Search\Client\MySQLClient'
