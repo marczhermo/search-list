@@ -47,6 +47,15 @@ NOCLIENT;
                 continue;
             }
 
+            if (!empty($index['crawlBased'])) {
+                $message .= sprintf(
+                    '<p>Crawler-based index type, "%s" for class "%s", use API dashboard.</p>',
+                    $index['name'],
+                    $index['class']
+                );
+                continue;
+            }
+
             $message .= sprintf('<p>Creating index, "%s" for class "%s"</p>', $index['name'], $index['class']);
             foreach ($clients as $client) {
                 $className = $client->getField('class');

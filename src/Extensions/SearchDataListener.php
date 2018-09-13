@@ -2,6 +2,7 @@
 
 namespace Marcz\Search\Extensions;
 
+use SiteTree;
 use DataExtension;
 use Config;
 use Marcz\Search\Config as SearchConfig;
@@ -33,7 +34,7 @@ class SearchDataListener extends DataExtension
         }
 
         foreach ($this->indices as $index) {
-            if ($index['class'] !== $this->owner->ClassName) {
+            if ($index['class'] !== $this->owner->ClassName || is_a($this->owner, SiteTree::class)) {
                 continue;
             }
 
@@ -56,7 +57,7 @@ class SearchDataListener extends DataExtension
         $this->setUp();
 
         foreach ($this->indices as $index) {
-            if ($index['class'] !== $this->owner->ClassName) {
+            if ($index['class'] !== $this->owner->ClassName || is_a($this->owner, SiteTree::class)) {
                 continue;
             }
 

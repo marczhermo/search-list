@@ -34,6 +34,7 @@ class ConfigTest extends SapphireTest
             [
                 'name' => 'Pages',
                 'class' => 'Page',
+                'crawlBased' => true,
                 'has_one' => '1',
                 'has_many' => '1',
                 'many_many' => '1',

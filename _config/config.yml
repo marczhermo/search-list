@@ -18,6 +18,7 @@ Marcz\Search\Config:
   indices:
     - name: 'Pages'
       class: 'Page'
+      crawlBased: true
       has_one: true
       has_many: true
       many_many: true
