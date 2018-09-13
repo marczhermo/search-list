@@ -7,9 +7,6 @@ DataObject:
 ContentController:
   extensions:
     - Marcz\Search\Extensions\SearchContentExtension
-SiteTree:
-  extensions:
-    - Marcz\Search\Extenstions\SearchListSiteTree
 Marcz\Search\Processor\Exporter:
   extensions:
     - Marcz\Search\Extensions\SafeguardMember
