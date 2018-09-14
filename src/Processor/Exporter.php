@@ -37,9 +37,7 @@ class Exporter extends Object
         $fields = Config::databaseFields($dataClassName);
 
         foreach ($fields as $column => $fieldType) {
-            if (in_array($fieldType, ['PrimaryKey'])
-                || !isset($map[$column])
-            ) {
+            if (!isset($map[$column])) {
                 continue;
             }
 

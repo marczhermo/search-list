@@ -114,6 +114,6 @@ NOCLIENT;
             $fields = array_merge((array) $parentFields, (array) $fields);
         }
 
-        return $fields;
+        return ['ID' => 'Int'] + $fields;
     }
 }
