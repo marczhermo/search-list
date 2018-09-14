@@ -90,6 +90,48 @@ Marcz\Search\Config:
 
 ````
 
+For `Page` indexing, we have a different configuration by binding `SearchListSiteTree` extension to `onAfterPublish` and `onAfterUnPublish` events.
+
+````
+SiteTree:
+  extensions:
+    - Marcz\Search\Extenstions\SearchListSiteTree
+````
+
+And then our `config.yml` will be like the example configuration below of `Page` which also includes other dataObjects for indexing.
+
+````
+Marcz\Search\Config:
+  batch_length: 100
+  indices:
+    - name: 'Pages'
+      class: 'Page'
+      crawlBased: true
+      has_one: true
+      has_many: true
+      many_many: true
+      searchableAttributes:
+        - 'Title'
+        - 'Content'
+        - 'MetaDescription'
+      attributesForFaceting:
+        - 'Title'
+        - 'ShowInSearch'
+    - name: 'FAQ'
+      class: 'FAQ'
+      has_one: true
+      has_many: true
+      many_many: true
+      searchableAttributes:
+        - 'Question'
+        - 'Answer'
+        - 'Keywords'
+        - 'Category'
+      attributesForFaceting:
+        - 'Keywords'
+        - 'Category'
+````
+
 ## Additional Tasks
 
 - SearchList: Configure DataObjects to Indices
