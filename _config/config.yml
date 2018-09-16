@@ -1,5 +1,6 @@
 ---
 Name: searchlist
+After: 'framework/*','cms/*'
 ---
 DataObject:
   extensions:

@@ -27,43 +27,47 @@ class Exporter extends Object
                 $dataClassName,
                 'Live'
             )->byID($dataObject->ID);
+            if (!$dataObject) {
+                return null;
+            }
         }
 
         $hasOne   = (array) $dataObject->config()->get('has_one');
         $hasMany  = (array) $dataObject->config()->get('has_many');
         $manyMany = (array) $dataObject->config()->get('many_many');
 
-        $map    = $dataObject->toMap();
+        $record    = $dataObject->toMap();
         $fields = Config::databaseFields($dataClassName);
+        $this->extend('updateExport', $record, $clientClassName);
 
         foreach ($fields as $column => $fieldType) {
-            if (!isset($map[$column])) {
+            if (!isset($record[$column])) {
                 continue;
             }
 
             if ($fieldType === 'ForeignKey') {
                 $field = Injector::inst()->create($fieldType, $column, $dataObject);
-                $map[$column] = (int) $map[$column];
+                $record[$column] = (int) $record[$column];
             } else {
                 $field = Injector::inst()->create($fieldType);
             }
 
             $formField = $field->scaffoldFormField();
             if ($formField instanceof UploadField) {
-                $map[$column] = (int) $map[$column];
+                $record[$column] = (int) $record[$column];
             } else {
-                $formField->setValue($map[$column]);
-                $map[$column] = $formField->dataValue();
+                $formField->setValue($record[$column]);
+                $record[$column] = $formField->dataValue();
             }
         }
 
         foreach ($hasOne as $column => $className) {
             $oneItem = $dataObject->{$column}();
             if ($oneItem instanceof File) {
-                $map[$column . '_URL'] = $oneItem->getAbsoluteURL();
-                $map[$column . '_Title'] = $oneItem->getTitle();
+                $record[$column . '_URL'] = $oneItem->getAbsoluteURL();
+                $record[$column . '_Title'] = $oneItem->getTitle();
             } else {
-                $map[$column] = $oneItem->getTitle();
+                $record[$column] = $oneItem->getTitle();
             }
         }
 
@@ -73,7 +77,7 @@ class Exporter extends Object
                 $items[] = $item->getTitle();
             }
             if ($items) {
-                $map[$column] = $items;
+                $record[$column] = $items;
             }
         }
 
@@ -89,17 +93,16 @@ class Exporter extends Object
                 }
             }
             if ($items) {
-                $map[$column] = $items;
+                $record[$column] = $items;
                 if ($contents) {
-                    $map[$column . '_content'] = $contents;
+                    $record[$column . '_content'] = $contents;
                 }
             }
         }
 
-        $this->extend('updateExport', $map, $clientClassName);
         $dataObject->destroy();
 
-        return $map;
+        return $record;
     }
 
     public function bulkExport($className, $startAt = 0, $max = 0, $clientClassName = null)
