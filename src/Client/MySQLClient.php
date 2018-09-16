@@ -148,7 +148,9 @@ class MySQLClient implements SearchClientAdaptor, DataSearcher
 
         $this->response = ['_total' => $this->clientAPI->count()];
 
-        $this->clientAPI = $this->clientAPI->limit("$pageNumber,$pageLength");
+
+        $start = ($pageNumber - 1) * $pageLength;
+        $this->clientAPI = $this->clientAPI->limit("$start,$pageLength");
 
         $this->response['hits'] = $this->clientAPI->toArray();
         $this->rawQuery = $this->clientAPI->sql();

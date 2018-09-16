@@ -60,7 +60,6 @@ class Config extends Object
 
     public static function resolveClient($clientName = null)
     {
-        $request          = Injector::inst()->get(SS_HTTPRequest::class);
         $session          = self::currentSession();
         $clients          = ArrayList::create(self::config()->get('clients'));
         $rememberedClient = $session->get(self::config()->get('session_key'));

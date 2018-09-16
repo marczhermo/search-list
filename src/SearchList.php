@@ -16,7 +16,7 @@ class SearchList extends ViewableData
     protected $clientAPI;
     protected $query;
     protected $filters    = [];
-    protected $pageNumber = 0;
+    protected $pageNumber = 1;
     protected $pageLength = 20;
 
     public function __construct($term = '', $indexName = null, $clientName = null)
@@ -38,6 +38,17 @@ class SearchList extends ViewableData
         $this->pageLength = (int) $pageLength;
 
         return $this;
+    }
+
+    /**
+     * Note: Must be called AFTER self::setPageLength() if different page length
+     * @param int $start
+     *
+     * @return $this
+     */
+    public function setStartAt($start = 0)
+    {
+        return $this->setPageNumber(1 + floor($start/$this->pageLength));
     }
 
     public function fetch()

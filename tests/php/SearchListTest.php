@@ -68,7 +68,7 @@ class SearchListTest extends SapphireTest
     public function testSetPageNumber()
     {
         $search = SearchList::create('Apple', 'Page', 'MySQL');
-        $search->setPageNumber(10)->fetch();
+        $search->setPageNumber(2)->fetch();
 
         $page = Page::get()
             ->filterAny(
@@ -78,7 +78,7 @@ class SearchListTest extends SapphireTest
                     'MetaDescription:PartialMatch' => 'Apple',
                 ]
             )
-            ->limit("10,20");
+            ->limit("20,20");
 
         $this->assertEquals($page->sql(), $search->sql());
     }
