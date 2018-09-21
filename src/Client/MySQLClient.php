@@ -90,7 +90,6 @@ class MySQLClient implements SearchClientAdaptor, DataSearcher
     public function search($term, $filters, $pageNumber, $pageLength)
     {
         $attribs  = $this->indexConfig['searchableAttributes'];
-        $fields   = Config::databaseFields($this->indexConfig['class']);
         $object   = Injector::inst()->create($this->indexConfig['class']);
         $hasOne   = $object->config()->get('has_one');
         $hasMany  = $object->config()->get('has_many');
@@ -115,14 +114,14 @@ class MySQLClient implements SearchClientAdaptor, DataSearcher
                 }
                 $filterName  = $filterName ?: 'PartialMatch';
                 $filterValue = $term;
-                $titleOrName = '';
+                $fieldSpec = Config::databaseFields($dataClass);
 
-                if ($schema->fieldSpec($dataClass, 'Title')) {
+                if (isset($fieldSpec['Title'])) {
                     $titleOrName = 'Title';
-                }
-
-                if ($schema->fieldSpec($dataClass, 'Name')) {
+                } elseif (isset($fieldSpec['Name'])) {
                     $titleOrName = 'Name';
+                } else {
+                    $titleOrName = '';
                 }
 
                 if (!$titleOrName) {
