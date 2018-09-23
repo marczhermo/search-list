@@ -50,7 +50,7 @@ class MySQLClient implements SearchClientAdaptor, DataSearcher
      */
     public function createIndex($indexName)
     {
-        return $this->initIndex($indexname);
+        return $this->initIndex($indexName);
     }
 
     /**
@@ -134,7 +134,7 @@ class MySQLClient implements SearchClientAdaptor, DataSearcher
                 break;
             }
 
-            if (!$isForeign)  {
+            if (!$isForeign) {
                 $filterName = $filterName ? ':' . $filterName : '';
                 $andFilters[$filterKey . $filterName] = $filterValue;
             }

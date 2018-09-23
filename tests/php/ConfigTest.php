@@ -15,6 +15,8 @@ use Config;
  */
 class ConfigTest extends SapphireTest
 {
+    use ConfigYMLTrait;
+
     protected $usesDatabase = true;
 
     public function setUp()
@@ -23,18 +25,6 @@ class ConfigTest extends SapphireTest
         // Created a singleton HTTPRequest with Session attached just like normal browsing
         $request = Injector::inst()->get(SS_HTTPRequest::class, true, ['GET', '/']);
         $this->searchConfigYmlFile();
-    }
-
-    protected function searchConfigYmlFile()
-    {
-        $fixture = Injector::inst()->create('YamlFixture', 'search-list/tests/fixture/search-config.yml');
-        $parser = new Spyc();
-        $fixtureContent = $parser->loadFile($fixture->getFixtureFile());
-        Config::inst()->update(
-            SearchConfig::class,
-            'indices',
-            $fixtureContent['Marcz\Search\Config']['indices']
-        );
     }
 
     public function testDetails()
