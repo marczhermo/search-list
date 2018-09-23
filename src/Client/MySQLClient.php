@@ -89,11 +89,11 @@ class MySQLClient implements SearchClientAdaptor, DataSearcher
 
     public function search($term, $filters, $pageNumber, $pageLength)
     {
-        $attribs  = $this->indexConfig['searchableAttributes'];
         $object   = Injector::inst()->create($this->indexConfig['class']);
-        $hasOne   = $object->config()->get('has_one');
-        $hasMany  = $object->config()->get('has_many');
-        $manyMany = $object->config()->get('many_many');
+        $attribs  = (array) $this->indexConfig['searchableAttributes'];
+        $hasOne   = (array) $object->config()->get('has_one');
+        $hasMany  = (array) $object->config()->get('has_many');
+        $manyMany = (array) $object->config()->get('many_many');
 
         $foreign    = array_merge((array) $hasOne, (array) $hasMany, (array) $manyMany);
         $orFilters  = $this->createInitialPartialMatch($term);
@@ -107,13 +107,14 @@ class MySQLClient implements SearchClientAdaptor, DataSearcher
             $filterKey      = array_shift($columnFilters);
             $filterName     = implode(':', $columnFilters);
             $filterValue    = current($filter);
+            $isForeign      = false;
 
             foreach ($foreignKeys as $columnName => $dataClass) {
+                $isForeign = false;
                 if ($columnName !== $filterKey) {
                     continue;
                 }
                 $filterName  = $filterName ?: 'PartialMatch';
-                $filterValue = $term;
                 $fieldSpec = Config::databaseFields($dataClass);
 
                 if (isset($fieldSpec['Title'])) {
@@ -128,12 +129,15 @@ class MySQLClient implements SearchClientAdaptor, DataSearcher
                     continue;
                 }
 
-                $orFilters[$filterKey . '.' . $titleOrName . ':' . $filterName] = $filterValue;
+                $isForeign = true;
+                $andFilters[$filterKey . '.' . $titleOrName . ':' . $filterName] = $filterValue;
                 break;
             }
 
-            $filterName = $filterName ? ':' . $filterName : '';
-            $andFilters[$filterKey . $filterName] = $filterValue;
+            if (!$isForeign)  {
+                $filterName = $filterName ? ':' . $filterName : '';
+                $andFilters[$filterKey . $filterName] = $filterValue;
+            }
         }
 
 
