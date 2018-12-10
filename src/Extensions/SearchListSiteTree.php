@@ -1,7 +1,8 @@
 <?php
 
-namespace Marcz\Search\Extenstions;
+namespace Marcz\Search\Extensions;
 
+use SiteTree;
 use SiteTreeExtension;
 use Config;
 use Marcz\Search\Config as SearchConfig;
@@ -37,7 +38,9 @@ class SearchListSiteTree extends SiteTreeExtension
         }
 
         foreach ($this->indices as $index) {
-            if (Config::inst()->get($index['class'], 'disabledIndex')) {
+            if (Config::inst()->get($index['class'], 'disabledIndex')
+                || !($this->owner instanceof $index['class'])
+            ) {
                 continue;
             }
 
@@ -59,7 +62,9 @@ class SearchListSiteTree extends SiteTreeExtension
         $this->setUp();
 
         foreach ($this->indices as $index) {
-            if (Config::inst()->get($index['class'], 'disabledIndex')) {
+            if (Config::inst()->get($index['class'], 'disabledIndex')
+                || !($this->owner instanceof $index['class'])
+            ) {
                 continue;
             }
 
