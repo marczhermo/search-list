@@ -1,0 +1,14 @@
+Marcz\Search\Config:
+ indices:
+   - name: 'Pages'
+     class: 'Page'
+     has_one: true
+     has_many: true
+     many_many: true
+     searchableAttributes:
+       - 'Title'
+       - 'Content'
+       - 'MetaDescription'
+     attributesForFaceting:
+       - 'Title'
+       - 'ShowInSearch'
