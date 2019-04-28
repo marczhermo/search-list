@@ -36,6 +36,11 @@ class SearchDataListener extends DataExtension
         return $indexClass === $this->owner->ClassName || $indexClass === $this->owner->getField('ObjectClass');
     }
 
+    protected function getOwnerID($owner)
+    {
+        return $owner->getField('ObjectID') ?: $owner->ID;
+    }
+
     public function onAfterWrite()
     {
         parent::onAfterWrite();
@@ -58,7 +63,7 @@ class SearchDataListener extends DataExtension
             foreach ($this->clients as $client) {
                 $className = $client->getField('class');
                 $clientObj = Injector::inst()->create($className);
-                $clientObj->createExportJob($index['name'], $index['class'], $this->owner->ID);
+                $clientObj->createExportJob($index['name'], $index['class'], $this->getOwnerID($this->owner));
             }
         }
     }
@@ -81,7 +86,7 @@ class SearchDataListener extends DataExtension
             foreach ($this->clients as $client) {
                 $className = $client->getField('class');
                 $clientObj = Injector::inst()->create($className);
-                $clientObj->createDeleteJob($index['name'], $index['class'], $this->owner->ID);
+                $clientObj->createDeleteJob($index['name'], $index['class'], $this->getOwnerID($this->owner));
             }
         }
     }
