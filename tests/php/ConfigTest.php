@@ -2,33 +2,33 @@
 
 namespace Marcz\Search\Tests;
 
+use SilverStripe\Control\Controller;
+use SilverStripe\Core\Environment;
+use SilverStripe\Dev\Debug;
 use SilverStripe\Dev\SapphireTest;
 use Marcz\Search\Config as SearchConfig;
 use SilverStripe\Core\Injector\Injector;
 use SilverStripe\Control\HTTPRequest;
 use SilverStripe\Control\Session;
+use Symfony\Component\Yaml\Yaml;
 
 /**
  * Config Test
  */
 class ConfigTest extends SapphireTest
 {
+    use FlushHelper;
+
     protected $usesDatabase = true;
 
-    public function setUp()
+    public function testIndices()
     {
-        parent::setUp();
-        // Created a singleton HTTPRequest with Session attached just like normal browsing
-        $request = Injector::inst()->get(HTTPRequest::class, true, ['GET', '/']);
-        $request->setSession(new Session([]));
-    }
+        // By default indices are configured to be empty
+        // In this way the programmer needs to configure this manually
+        $this->assertEmpty(SearchConfig::indices());
 
-    public function testDetails()
-    {
-        $config = SearchConfig::create()->details();
-        $this->assertArrayHasKey('indices', $config);
-        $this->assertArrayHasKey('clients', $config);
-        $this->assertArrayHasKey('batch_length', $config);
+        // Creating indices manually similar to adding YAML configuration
+        $this->helpAddIndexConfiguration();
 
         $this->assertContains(
             [
@@ -44,9 +44,12 @@ class ConfigTest extends SapphireTest
                     'Title', 'ShowInSearch'
                 ],
             ],
-            $config['indices']
+            SearchConfig::indices()
         );
+    }
 
+    public function testClients()
+    {
         $this->assertContains(
             [
                 'name' => 'MySQL',
@@ -55,17 +58,22 @@ class ConfigTest extends SapphireTest
                 'export' => false,
                 'class' => 'Marcz\Search\Client\MySQLClient'
             ],
-            $config['clients']
+            SearchConfig::clients()
         );
+    }
 
-        $this->assertEquals(100, $config['batch_length']);
+    public function testBatchLength()
+    {
+        $this->assertEquals(100, SearchConfig::batchLength());
     }
 
     public function testResolveIndex()
     {
-        $config = SearchConfig::create();
-        $this->assertEquals('Pages', $config->resolveIndex());
-        $this->assertEquals('Pages', $config->resolveIndex('Pages'));
+        // Creating indices manually similar to adding YAML configuration
+        $this->helpAddIndexConfiguration();
+
+        $this->assertEquals('Pages', SearchConfig::resolveIndex());
+        $this->assertEquals('Pages', SearchConfig::resolveIndex('Pages'));
     }
 
     /**
@@ -83,8 +91,8 @@ class ConfigTest extends SapphireTest
         $this->assertEquals('MySQL', SearchConfig::resolveClient('MySQL'));
         $this->assertEquals('MySQL', SearchConfig::resolveClient());
 
-        // Existing Session by other sources
-        $request = Injector::inst()->get(HTTPRequest::class);
+        $controller = Controller::curr();
+        $request = $controller->getRequest();
         $session = $request->getSession();
         $session->set(SearchConfig::config()->get('session_key'), 'CustomClient');
         $this->assertEquals('CustomClient', SearchConfig::resolveClient());

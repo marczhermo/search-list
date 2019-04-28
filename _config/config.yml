@@ -7,27 +7,10 @@ SilverStripe\ORM\DataObject:
 SilverStripe\CMS\Controllers\ContentController:
   extensions:
     - Marcz\Search\Extensions\SearchContentExtension
-SilverStripe\CMS\Model\SiteTree:
-  extensions:
-    - Marcz\Search\Extenstions\SearchListSiteTree
 Marcz\Search\Processor\Exporter:
   extensions:
     - Marcz\Search\Extensions\SafeguardMember
 Marcz\Search\Config:
-  batch_length: 100
-  indices:
-    - name: 'Pages'
-      class: 'Page'
-      has_one: true
-      has_many: true
-      many_many: true
-      searchableAttributes:
-        - 'Title'
-        - 'Content'
-        - 'MetaDescription'
-      attributesForFaceting:
-        - 'Title'
-        - 'ShowInSearch'
   clients:
     - name: 'MySQL'
       write: false
