@@ -2,7 +2,6 @@
 
 namespace Marcz\Search;
 
-use Object;
 use DataObject;
 use Controller;
 use Session;
@@ -11,7 +10,7 @@ use SS_HTTPRequest;
 use Injector;
 use Exception;
 
-class Config extends Object
+class Config extends SS_Object
 {
     private static $session_key = 'SearchListRememberedClient';
     private static $batch_length = 100;
