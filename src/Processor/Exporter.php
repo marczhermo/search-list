@@ -4,13 +4,12 @@ namespace Marcz\Search\Processor;
 
 use UploadField;
 use File;
-use Object;
 use DataObject;
 use DataList;
 use Marcz\Search\Config;
 use Versioned;
 
-class Exporter extends Object
+class Exporter extends SS_Object
 {
     protected $className;
 
