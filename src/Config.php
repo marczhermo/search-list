@@ -2,6 +2,7 @@
 
 namespace Marcz\Search;
 
+use SS_Object;
 use DataObject;
 use Controller;
 use Session;

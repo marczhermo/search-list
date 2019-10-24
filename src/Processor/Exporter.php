@@ -4,6 +4,7 @@ namespace Marcz\Search\Processor;
 
 use UploadField;
 use File;
+use SS_Object;
 use DataObject;
 use DataList;
 use Marcz\Search\Config;
