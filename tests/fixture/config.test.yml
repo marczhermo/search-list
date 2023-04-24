@@ -1,14 +1,16 @@
 Marcz\Search\Config:
- indices:
-   - name: 'Pages'
-     class: 'Page'
-     has_one: true
-     has_many: true
-     many_many: true
-     searchableAttributes:
-       - 'Title'
-       - 'Content'
-       - 'MetaDescription'
-     attributesForFaceting:
-       - 'Title'
-       - 'ShowInSearch'
+  indices:
+    - name: 'Pages'
+      class: 'Page'
+      searchableAttributes:
+        - 'Title'
+        - 'Content'
+        - 'MetaDescription'
+      attributesForFaceting:
+        - 'Title'
+        - 'ShowInSearch'
+  clients:
+    - name: 'MySQL'
+      write: false
+      export: false
+      class: 'Marcz\Search\Client\MySQLClient'

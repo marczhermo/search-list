@@ -13,36 +13,63 @@ use Exception;
 
 class Config
 {
-    use Injectable, Configurable;
+    use Injectable;
+    use Configurable;
+
     private static $session_key = 'SearchListRememberedClient';
+
     private static $indices = [];
+
     private static $clients = [];
+
     private static $batch_length = 100;
 
-    public static function indices()
+    public static function indices(): array
     {
-        return self::config()->get('indices');
+        $indices = self::config()->get('indices');
+
+        return $indices ?? [];
     }
 
-    public static function clients()
+    public static function clients(): array
     {
-        return self::config()->get('clients');
+        $client = self::config()->get('clients');
+
+        return $client ?? [];
     }
 
-    public static function batchLength()
+    public static function batchLength(): int
     {
-        return self::config()->get('batch_length');
+        return self::config()->get('batch_length') ?? 100;
     }
 
-    public static function resolveIndex($indexName = null)
+    public static function resolveIndex(string $indexName = ''): string
     {
         $indices = ArrayList::create(self::indices());
-        $index   = $indices->find('name', $indexName);
+        $noIndex = sprintf(
+            'Exception: No index configuration. See example below:%s%s',
+            PHP_EOL,
+            self::config()->get('example_index_config')
+        );
 
-        return $index ? $index['name'] : $indices->first()['name'];
+        if (!$indices->exists()) {
+            throw new Exception($noIndex);
+        }
+
+        if ($indexName) {
+            $index = $indices->find('name', $indexName);
+
+            if (!$index) {
+                throw new Exception($noIndex);
+            }
+
+            return $index['name'];
+        }
+
+        return $indices->first()['name'];
     }
 
-    public static function resolveClient($clientName = null)
+    public static function resolveClient(string $clientName = ''): string
     {
         $controller       = Controller::curr();
         $request          = $controller->getRequest();
@@ -52,19 +79,14 @@ class Config
 
         if ($clientName) {
             $client = $clients->find('name', $clientName);
+
             if (!$client) {
-                $noClient = <<<NOCLIENT
-Error: No clients configurations. See example below:
-<pre>
-Marcz\Search\Config:
-  clients:
-    - name: 'Algolia'
-      write: true
-      delete: true
-      export: 'json'
-      class: 'Marcz\Algolia\AlgoliaClient'
-</pre>
-NOCLIENT;
+                $noClient = sprintf(
+                    'Exception: No clients configuration. See example below:%s%s',
+                    PHP_EOL,
+                    self::config()->get('example_client_config')
+                );
+
                 throw new Exception($noClient);
             }
 

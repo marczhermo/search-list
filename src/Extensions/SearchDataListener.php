@@ -24,8 +24,12 @@ class SearchDataListener extends DataExtension
             ->filter(['write'  => true]);
     }
 
-    protected function isRunningDevBuild()
+    protected function canSkipControllerChecks(): bool
     {
+        if(!Controller::has_curr()) {
+            return true;
+        }
+
         $controller = Controller::curr();
 
         return $controller && stripos($controller->getRequest()->getURL(), 'dev/build') === 0;
@@ -47,7 +51,7 @@ class SearchDataListener extends DataExtension
 
         $this->setUp();
 
-        if ($this->isRunningDevBuild()) {
+        if ($this->canSkipControllerChecks()) {
             return;
         }
 
@@ -74,7 +78,7 @@ class SearchDataListener extends DataExtension
 
         $this->setUp();
 
-        if ($this->isRunningDevBuild()) {
+        if ($this->canSkipControllerChecks()) {
             return;
         }
 

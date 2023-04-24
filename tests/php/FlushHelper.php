@@ -14,7 +14,7 @@ trait FlushHelper
      * @return void
      * @throws \Exception
      */
-    public static function setUpBeforeClass()
+    public static function setUpBeforeClass(): void
     {
         if (in_array('flush=1', $_SERVER['argv'])) {
             $GLOBALS['_GET']['flush'] = 1;
@@ -26,7 +26,7 @@ trait FlushHelper
      * Creating indices manually similar to adding YAML configuration
      * @return \SilverStripe\Core\Config\Config_ForClass
      */
-    public function helpAddIndexConfiguration()
+    public function fixtureApplyConfiguration()
     {
         // Creating indices manually similar to adding YAML configuration
         $config = SearchConfig::config();

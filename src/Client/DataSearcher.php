@@ -1,4 +1,5 @@
 <?php
+
 namespace Marcz\Search\Client;
 
 interface DataSearcher

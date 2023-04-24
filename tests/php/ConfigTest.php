@@ -7,14 +7,12 @@ use SilverStripe\Core\Environment;
 use SilverStripe\Dev\Debug;
 use SilverStripe\Dev\SapphireTest;
 use Marcz\Search\Config as SearchConfig;
+use Marcz\Search\Client\MySQLClient;
 use SilverStripe\Core\Injector\Injector;
 use SilverStripe\Control\HTTPRequest;
 use SilverStripe\Control\Session;
 use Symfony\Component\Yaml\Yaml;
 
-/**
- * Config Test
- */
 class ConfigTest extends SapphireTest
 {
     use FlushHelper;
@@ -28,15 +26,12 @@ class ConfigTest extends SapphireTest
         $this->assertEmpty(SearchConfig::indices());
 
         // Creating indices manually similar to adding YAML configuration
-        $this->helpAddIndexConfiguration();
+        $this->fixtureApplyConfiguration();
 
         $this->assertContains(
             [
                 'name' => 'Pages',
                 'class' => 'Page',
-                'has_one' => '1',
-                'has_many' => '1',
-                'many_many' => '1',
                 'searchableAttributes' => [
                     'Title', 'Content', 'MetaDescription'
                 ],
@@ -54,9 +49,8 @@ class ConfigTest extends SapphireTest
             [
                 'name' => 'MySQL',
                 'write' => false,
-                'delete' => false,
                 'export' => false,
-                'class' => 'Marcz\Search\Client\MySQLClient'
+                'class' => MySQLClient::class
             ],
             SearchConfig::clients()
         );
@@ -67,21 +61,28 @@ class ConfigTest extends SapphireTest
         $this->assertEquals(100, SearchConfig::batchLength());
     }
 
+    public function testResolveIndexWithException()
+    {
+        $this->expectException('Exception');
+        $this->expectExceptionMessage('Exception: No index configuration.');
+
+        SearchConfig::resolveIndex('Unknown');
+    }
+
     public function testResolveIndex()
     {
         // Creating indices manually similar to adding YAML configuration
-        $this->helpAddIndexConfiguration();
+        $this->fixtureApplyConfiguration();
 
         $this->assertEquals('Pages', SearchConfig::resolveIndex());
         $this->assertEquals('Pages', SearchConfig::resolveIndex('Pages'));
     }
 
-    /**
-     * @expectedException Exception
-     * @expectedExceptionMessage Error: No clients configurations.
-     */
     public function testResolveClientWithException()
     {
+        $this->expectException('Exception');
+        $this->expectExceptionMessage('Exception: No clients configuration.');
+
         SearchConfig::resolveClient('Unknown');
     }
 
@@ -104,14 +105,12 @@ class ConfigTest extends SapphireTest
 
     public function testGetCurrentClient()
     {
-        SearchConfig::resolveClient('MySQL');
         $this->assertEquals(
             [
                 'name' => 'MySQL',
                 'write' => false,
-                'delete' => false,
                 'export' => false,
-                'class' => 'Marcz\Search\Client\MySQLClient',
+                'class' => MySQLClient::class,
             ],
             SearchConfig::getCurrentClient()
         );
