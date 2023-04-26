@@ -11,40 +11,39 @@ use Marcz\Search\SearchList;
 use SilverStripe\ORM\ArrayList;
 use Page;
 
-/**
- * Config Test
- */
 class SearchListTest extends SapphireTest
 {
+    use FlushHelper;
+
     protected $usesDatabase = true;
 
-    public function setUp()
+    public function setUp(): void
     {
         parent::setUp();
+
         // $_REQUEST['showqueries'] = 'inline';
-        // Created a singleton HTTPRequest with Session attached just like normal browsing
-        $request = Injector::inst()->get(HTTPRequest::class, true, ['GET', '/']);
-        $request->setSession(new Session([]));
+        // Creating indices manually similar to adding YAML configuration
+        $this->fixtureApplyConfiguration();
     }
 
     public function testConstructor()
     {
         $this->assertInstanceOf(
             SearchList::class,
-            SearchList::create('Apple', 'Page', 'MySQL')
+            SearchList::create('Apple', 'Pages', 'MySQL')
         );
     }
 
     public function testFetch()
     {
-        $search = SearchList::create('Apple', 'Page', 'MySQL');
+        $search = SearchList::create('Apple', 'Pages', 'MySQL');
 
         $this->assertInstanceOf(ArrayList::class, $search->fetch());
     }
 
     public function testGetResponse()
     {
-        $search = SearchList::create('Apple', 'Page', 'MySQL');
+        $search = SearchList::create('Apple', 'Pages', 'MySQL');
         $search->fetch();
 
         $this->assertArrayHasKey('_total', $search->getResponse());
@@ -53,7 +52,7 @@ class SearchListTest extends SapphireTest
 
     public function testSetPageNumber()
     {
-        $search = SearchList::create('Apple', 'Page', 'MySQL');
+        $search = SearchList::create('Apple', 'Pages', 'MySQL');
         $search->setPageNumber(10)->fetch();
 
         $page = Page::get()
@@ -71,7 +70,7 @@ class SearchListTest extends SapphireTest
 
     public function testSetPageLength()
     {
-        $search = SearchList::create('Apple', 'Page', 'MySQL');
+        $search = SearchList::create('Apple', 'Pages', 'MySQL');
         $search->setPageLength(100)->fetch();
 
         $page = Page::get()
@@ -89,7 +88,7 @@ class SearchListTest extends SapphireTest
 
     public function testSql()
     {
-        $search = SearchList::create('Apple', 'Page', 'MySQL');
+        $search = SearchList::create('Apple', 'Pages', 'MySQL');
 
         $this->assertEquals('Run fetch() first.', $search->sql());
 
@@ -103,6 +102,7 @@ class SearchListTest extends SapphireTest
                 ]
             )
             ->limit("0,20");
+
         $this->assertEquals($page->sql(), $search->sql());
     }
 }

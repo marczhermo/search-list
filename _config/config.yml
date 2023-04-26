@@ -1,36 +1,35 @@
 ---
-Name: searchlist
+Name: search-list
 ---
 SilverStripe\ORM\DataObject:
   extensions:
+    - Marcz\Search\Extensions\IndexableFieldsExtension
     - Marcz\Search\Extensions\SearchDataListener
 SilverStripe\CMS\Controllers\ContentController:
   extensions:
     - Marcz\Search\Extensions\SearchContentExtension
-SilverStripe\CMS\Model\SiteTree:
-  extensions:
-    - Marcz\Search\Extenstions\SearchListSiteTree
 Marcz\Search\Processor\Exporter:
   extensions:
     - Marcz\Search\Extensions\SafeguardMember
 Marcz\Search\Config:
-  batch_length: 100
-  indices:
-    - name: 'Pages'
-      class: 'Page'
-      has_one: true
-      has_many: true
-      many_many: true
-      searchableAttributes:
-        - 'Title'
-        - 'Content'
-        - 'MetaDescription'
-      attributesForFaceting:
-        - 'Title'
-        - 'ShowInSearch'
   clients:
     - name: 'MySQL'
       write: false
-      delete: false
       export: false
       class: 'Marcz\Search\Client\MySQLClient'
+  example_client_config: |-
+    <pre>
+    Marcz\Search\Config:
+      clients:
+        - name: 'Swiftype'
+          write: true
+          export: 'json'
+          class: 'Marcz\Swiftype\SwiftypeClient'
+    </pre>
+  example_index_config: |-
+    <pre>
+    Marcz\Search\Config:
+      indices:
+        - name: 'Pages'
+          class: 'Page'
+    </pre>

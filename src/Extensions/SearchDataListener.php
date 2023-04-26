@@ -2,23 +2,47 @@
 
 namespace Marcz\Search\Extensions;
 
+use SilverStripe\Control\Controller;
 use SilverStripe\ORM\DataExtension;
-use Marcz\Search\Config;
+use Marcz\Search\Config as SearchConfig;
 use SilverStripe\ORM\ArrayList;
 use SilverStripe\Core\Injector\Injector;
+use SilverStripe\Dev\Debug;
+use SilverStripe\Versioned\Versioned;
 
 class SearchDataListener extends DataExtension
 {
     protected $indices;
     protected $clients;
+    protected $batchLength;
 
     protected function setUp()
     {
-        $this->indices = Config::config()->get('indices');
-        $this->clients = ArrayList::create(Config::config()->get('clients'))
-                    ->filter([
-                        'write'  => true,
-                    ]);
+        $this->batchLength = SearchConfig::batchLength();
+        $this->indices = SearchConfig::indices();
+        $this->clients = ArrayList::create(SearchConfig::clients())
+            ->filter(['write'  => true]);
+    }
+
+    protected function canSkipControllerChecks(): bool
+    {
+        if(!Controller::has_curr()) {
+            return true;
+        }
+
+        $controller = Controller::curr();
+
+        return $controller && stripos($controller->getRequest()->getURL(), 'dev/build') === 0;
+    }
+
+    protected function indexMatchesClassName($indexClass)
+    {
+        return $indexClass === $this->owner->ClassName || $indexClass === $this->owner->getField('ObjectClass');
+    }
+
+    protected function getOwnerID($owner)
+    {
+        return $owner->getField('ObjectID') ?: $owner->ID;
     }
 
     public function onAfterWrite()
@@ -27,19 +51,23 @@ class SearchDataListener extends DataExtension
 
         $this->setUp();
 
+        if ($this->canSkipControllerChecks()) {
+            return;
+        }
+
         if (!$this->clients->exists()) {
             return;
         }
 
         foreach ($this->indices as $index) {
-            if ($index['class'] !== $this->owner->ClassName) {
+            if (!$this->indexMatchesClassName($index['class'])) {
                 continue;
             }
 
             foreach ($this->clients as $client) {
                 $className = $client->getField('class');
                 $clientObj = Injector::inst()->create($className);
-                $clientObj->createExportJob($index['name'], $index['class'], $this->owner->ID);
+                $clientObj->createExportJob($index['name'], $index['class'], $this->getOwnerID($this->owner));
             }
         }
     }
@@ -50,15 +78,19 @@ class SearchDataListener extends DataExtension
 
         $this->setUp();
 
+        if ($this->canSkipControllerChecks()) {
+            return;
+        }
+
         foreach ($this->indices as $index) {
-            if ($index['class'] !== $this->owner->ClassName) {
+            if (!$this->indexMatchesClassName($index['class'])) {
                 continue;
             }
 
             foreach ($this->clients as $client) {
                 $className = $client->getField('class');
                 $clientObj = Injector::inst()->create($className);
-                $clientObj->createDeleteJob($index['name'], $index['class'], $this->owner->ID);
+                $clientObj->createDeleteJob($index['name'], $index['class'], $this->getOwnerID($this->owner));
             }
         }
     }

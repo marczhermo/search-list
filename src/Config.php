@@ -2,8 +2,10 @@
 
 namespace Marcz\Search;
 
+use SilverStripe\Control\Controller;
 use SilverStripe\Core\Injector\Injectable;
 use SilverStripe\Core\Config\Configurable;
+use SilverStripe\Dev\Debug;
 use SilverStripe\ORM\ArrayList;
 use SilverStripe\Control\HTTPRequest;
 use SilverStripe\Core\Injector\Injector;
@@ -11,48 +13,80 @@ use Exception;
 
 class Config
 {
-    use Injectable, Configurable;
+    use Injectable;
+    use Configurable;
+
     private static $session_key = 'SearchListRememberedClient';
 
-    public function details()
+    private static $indices = [];
+
+    private static $clients = [];
+
+    private static $batch_length = 100;
+
+    public static function indices(): array
     {
-        return [
-            'indices'      => self::config()->get('indices'),
-            'clients'      => self::config()->get('clients'),
-            'batch_length' => self::config()->get('batch_length'),
-        ];
+        $indices = self::config()->get('indices');
+
+        return $indices ?? [];
     }
 
-    public static function resolveIndex($indexName = null)
+    public static function clients(): array
     {
-        $indices = ArrayList::create(self::config()->get('indices'));
-        $index   = $indices->find('name', $indexName);
+        $client = self::config()->get('clients');
 
-        return $index ? $index['name'] : $indices->first()['name'];
+        return $client ?? [];
     }
 
-    public static function resolveClient($clientName = null)
+    public static function batchLength(): int
     {
-        $request          = Injector::inst()->get(HTTPRequest::class);
+        return self::config()->get('batch_length') ?? 100;
+    }
+
+    public static function resolveIndex(string $indexName = ''): string
+    {
+        $indices = ArrayList::create(self::indices());
+        $noIndex = sprintf(
+            'Exception: No index configuration. See example below:%s%s',
+            PHP_EOL,
+            self::config()->get('example_index_config')
+        );
+
+        if (!$indices->exists()) {
+            throw new Exception($noIndex);
+        }
+
+        if ($indexName) {
+            $index = $indices->find('name', $indexName);
+
+            if (!$index) {
+                throw new Exception($noIndex);
+            }
+
+            return $index['name'];
+        }
+
+        return $indices->first()['name'];
+    }
+
+    public static function resolveClient(string $clientName = ''): string
+    {
+        $controller       = Controller::curr();
+        $request          = $controller->getRequest();
         $session          = $request->getSession();
-        $clients          = ArrayList::create(self::config()->get('clients'));
+        $clients          = ArrayList::create(self::clients());
         $rememberedClient = $session->get(self::config()->get('session_key'));
 
         if ($clientName) {
             $client = $clients->find('name', $clientName);
+
             if (!$client) {
-                $noClient = <<<NOCLIENT
-Error: No clients configurations. See example below:
-<pre>
-Marcz\Search\Config:
-  clients:
-    - name: 'Algolia'
-      write: true
-      delete: true
-      export: 'json'
-      class: 'Marcz\Algolia\AlgoliaClient'
-</pre>
-NOCLIENT;
+                $noClient = sprintf(
+                    'Exception: No clients configuration. See example below:%s%s',
+                    PHP_EOL,
+                    self::config()->get('example_client_config')
+                );
+
                 throw new Exception($noClient);
             }
 
@@ -74,7 +108,7 @@ NOCLIENT;
 
     public static function getCurrentClient()
     {
-        $clients = ArrayList::create(self::config()->get('clients'));
+        $clients = ArrayList::create(self::clients());
 
         return $clients->find('name', self::resolveClient());
     }

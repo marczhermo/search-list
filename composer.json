@@ -4,27 +4,19 @@
     "type": "silverstripe-vendormodule",
     "license": "BSD-3-Clause",
     "keywords": [
-        "searchlist",
-        "silverstripe",
-        "search",
-        "admin"
+        "SearchList",
+        "SilverStripe",
+        "search"
     ],
     "require": {
-        "silverstripe/admin": "^1@dev",
         "silverstripe/framework": "^4@dev",
-        "silverstripe/versioned": "^1@dev",
-        "silverstripe/vendor-plugin": "^1.0",
-        "symbiote/silverstripe-queuedjobs": "^4.1"
+        "silverstripe/vendor-plugin": "^1.0"
     },
     "require-dev": {
-        "phpunit/phpunit": "^5.7",
-        "silverstripe/cms": "^4@dev"
-    },
-    "extra": {
-        "expose": [
-            "client/dist",
-            "client/lang"
-        ]
+        "phpunit/phpunit": "^9.5",
+        "silverstripe/admin": "^1@dev",
+        "silverstripe/cms": "^4@dev",
+        "symbiote/silverstripe-queuedjobs": "^4.1"
     },
     "autoload": {
         "psr-4": {
@@ -36,5 +28,11 @@
         "lint": "php phpcs.phar src/ tests/php/"
     },
     "minimum-stability": "dev",
-    "prefer-stable": true
+    "prefer-stable": true,
+    "config": {
+        "allow-plugins": {
+            "composer/installers": true,
+            "silverstripe/vendor-plugin": true
+        }
+    }
 }
